@@ -26,17 +26,25 @@ const Chat = () => {
       {/* Sidebar Toggle Button */}
       <button
         onClick={toggleSidebar}
-        className={`fixed top-4 left-4 z-50 p-2 bg-dark-3 border border-dark-4 rounded-lg hover:bg-dark-2 transition-all duration-300 ${
+        className={`fixed top-20 left-4 z-50 p-2 bg-dark-3 border border-dark-4 rounded-lg hover:bg-dark-2 transition-all duration-300 ${
           isSidebarOpen ? 'lg:hidden' : ''
         }`}
       >
-        <img
-          src={isSidebarOpen ? "/assets/icons/back.svg" : "/assets/icons/chat.svg"}
-          alt={isSidebarOpen ? "Hide sidebar" : "Show sidebar"}
-          width={20}
-          height={20}
-          className="invert"
-        />
+        {isSidebarOpen ? (
+          <img
+            src="/assets/icons/back.svg"
+            alt="Hide sidebar"
+            width={20}
+            height={20}
+            className="filter brightness-0 invert"
+          />
+        ) : (
+          <div className="w-5 h-5 flex flex-col justify-center gap-1">
+            <div className="w-full h-0.5 bg-white rounded"></div>
+            <div className="w-full h-0.5 bg-white rounded"></div>
+            <div className="w-full h-0.5 bg-white rounded"></div>
+          </div>
+        )}
       </button>
 
       {/* Conversations Sidebar */}
@@ -80,7 +88,7 @@ const Chat = () => {
                 alt="No conversation"
                 width={80}
                 height={80}
-                className="mx-auto mb-4 opacity-50 invert"
+                className="mx-auto mb-4 opacity-50 filter brightness-0 invert"
               />
               <h3 className="text-xl font-semibold mb-2">Selecciona una conversación</h3>
               <p className="text-sm">Elige una conversación del sidebar o busca un usuario para empezar a chatear</p>
