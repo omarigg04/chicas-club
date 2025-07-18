@@ -14,7 +14,8 @@ const UserCard = ({ user }: UserCardProps) => {
   const navigate = useNavigate();
   const { user: currentUser } = useUserContext();
   const { toast } = useToast();
-  const { mutateAsync: createOrGetConversation, isPending } = useCreateOrGetConversation();
+  const { mutateAsync: createOrGetConversation, status } = useCreateOrGetConversation();
+  const isCreatingConversation = status === 'loading';
   const { mutateAsync: followUser, isPending: isFollowPending } = useFollowUser();
   const { mutateAsync: unfollowUser, isPending: isUnfollowPending } = useUnfollowUser();
   const { data: isFollowingUser, isLoading: isCheckingFollow } = useIsFollowing(currentUser?.id || "", user.$id);
@@ -104,9 +105,9 @@ const UserCard = ({ user }: UserCardProps) => {
           size="sm" 
           className="shad-button_dark_4 px-3 h-9"
           onClick={handleStartChat}
-          disabled={isPending}
+          disabled={isCreatingConversation}
         >
-          {isPending ? "..." : "Chat"}
+          {isCreatingConversation ? "..." : "Chat"}
         </Button>
       </div>
     </div>
