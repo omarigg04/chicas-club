@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useUserContext } from "@/context/AuthContext";
 import { searchUsers, createOrGetConversation } from "@/lib/appwrite/api";
 import { useNavigate } from "react-router-dom";
+import { Models } from "appwrite";
 
-interface User {
-  $id: string;
+interface User extends Models.Document {
   name: string;
   username: string;
   imageUrl: string;
@@ -30,8 +30,8 @@ const UserSearch = ({ onUserSelect }: UserSearchProps) => {
           const results = await searchUsers(searchTerm);
           // Filter out current user
           const filteredResults = results.documents.filter(
-            (u: User) => u.$id !== user.id
-          );
+            (u: Models.Document) => u.$id !== user.id
+          ) as User[];
           setSearchResults(filteredResults);
           setShowResults(true);
         } catch (error) {
