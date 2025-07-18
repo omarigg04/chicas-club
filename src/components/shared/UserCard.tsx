@@ -2,7 +2,7 @@ import { Models } from "appwrite";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Button } from "../ui/button";
-import { useCreateOrGetConversation } from "@/lib/react-query/queries";
+import { useCreateOrGetConversation, useFollowUser, useUnfollowUser, useIsFollowing } from "@/lib/react-query/queries";
 import { useUserContext } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -15,6 +15,9 @@ const UserCard = ({ user }: UserCardProps) => {
   const { user: currentUser } = useUserContext();
   const { toast } = useToast();
   const { mutateAsync: createOrGetConversation, isPending } = useCreateOrGetConversation();
+  const { mutateAsync: followUser, isPending: isFollowPending } = useFollowUser();
+  const { mutateAsync: unfollowUser, isPending: isUnfollowPending } = useUnfollowUser();
+  const { data: isFollowingUser, isLoading: isCheckingFollow } = useIsFollowing(currentUser?.id || "", user.$id);
 
   const handleStartChat = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -31,6 +34,35 @@ const UserCard = ({ user }: UserCardProps) => {
       toast({
         title: "Error",
         description: "Failed to start conversation. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleFollowToggle = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!currentUser) return;
+    
+    try {
+      if (isFollowingUser) {
+        await unfollowUser({ followerId: currentUser.id, followingId: user.$id });
+        toast({
+          title: "Success",
+          description: `You unfollowed ${user.name}`,
+        });
+      } else {
+        await followUser({ followerId: currentUser.id, followingId: user.$id });
+        toast({
+          title: "Success", 
+          description: `You are now following ${user.name}`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
         variant: "destructive",
       });
     }
@@ -58,13 +90,19 @@ const UserCard = ({ user }: UserCardProps) => {
       </div>
 
       <div className="flex gap-2">
-        <Button type="button" size="sm" className="shad-button_primary px-3">
-          Follow
+        <Button 
+          type="button" 
+          size="sm" 
+          className={isFollowingUser ? "shad-button_dark_4 px-3 h-9" : "shad-button_primary px-3 h-9"}
+          onClick={handleFollowToggle}
+          disabled={isFollowPending || isUnfollowPending || isCheckingFollow || currentUser?.id === user.$id}
+        >
+          {isFollowPending || isUnfollowPending ? "..." : isFollowingUser ? "Unfollow" : "Follow"}
         </Button>
         <Button 
           type="button" 
           size="sm" 
-          className="shad-button_dark_4 px-3"
+          className="shad-button_dark_4 px-3 h-9"
           onClick={handleStartChat}
           disabled={isPending}
         >

@@ -741,3 +741,132 @@ export async function markConversationAsRead(conversationId: string, userId: str
     console.log(error);
   }
 }
+
+// ============================================================
+// FOLLOWS
+// ============================================================
+
+// ============================== FOLLOW USER
+export async function followUser(followerId: string, followingId: string) {
+  try {
+    const newFollow = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.followsCollectionId,
+      ID.unique(),
+      {
+        followerId,
+        followingId,
+        createdAt: new Date(),
+      }
+    );
+
+    return newFollow;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== UNFOLLOW USER
+export async function unfollowUser(followerId: string, followingId: string) {
+  try {
+    const followRecord = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.followsCollectionId,
+      [
+        Query.equal("followerId", followerId),
+        Query.equal("followingId", followingId),
+      ]
+    );
+
+    if (followRecord.documents.length > 0) {
+      await databases.deleteDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.followsCollectionId,
+        followRecord.documents[0].$id
+      );
+    }
+
+    return { status: "Ok" };
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== CHECK IF FOLLOWING
+export async function isFollowing(followerId: string, followingId: string) {
+  try {
+    const followRecord = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.followsCollectionId,
+      [
+        Query.equal("followerId", followerId),
+        Query.equal("followingId", followingId),
+      ]
+    );
+
+    return followRecord.documents.length > 0;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
+// ============================== GET USER FOLLOWING
+export async function getUserFollowing(userId: string) {
+  try {
+    const following = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.followsCollectionId,
+      [Query.equal("followerId", userId)]
+    );
+
+    return following;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== GET USER FOLLOWERS
+export async function getUserFollowers(userId: string) {
+  try {
+    const followers = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.followsCollectionId,
+      [Query.equal("followingId", userId)]
+    );
+
+    return followers;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== GET POSTS FROM FOLLOWED USERS
+export async function getPostsFromFollowedUsers(userId: string) {
+  try {
+    // First get the list of users that current user follows
+    const following = await getUserFollowing(userId);
+    
+    if (!following || following.documents.length === 0) {
+      return { documents: [] };
+    }
+
+    // Extract the IDs of followed users
+    const followedUserIds = following.documents.map(follow => follow.followingId);
+    
+    // Get posts from followed users
+    const posts = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.postCollectionId,
+      [
+        Query.equal("creator", followedUserIds),
+        Query.orderDesc("$createdAt"),
+        Query.limit(20)
+      ]
+    );
+
+    return posts;
+  } catch (error) {
+    console.log(error);
+  }
+}

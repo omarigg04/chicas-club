@@ -2,16 +2,29 @@ import { Models } from "appwrite";
 
 // import { useToast } from "@/components/ui/use-toast";
 import { Loader, PostCard, UserCard } from "@/components/shared";
-import { useGetRecentPosts, useGetUsers } from "@/lib/react-query/queries";
+import { useGetRecentPosts, useGetUsers, useGetPostsFromFollowedUsers } from "@/lib/react-query/queries";
+import { useUserContext } from "@/context/AuthContext";
 
 const Home = () => {
   // const { toast } = useToast();
+  const { user: currentUser } = useUserContext();
 
   const {
-    data: posts,
-    isLoading: isPostLoading,
-    isError: isErrorPosts,
+    data: followedPosts,
+    isLoading: isFollowedPostsLoading,
+    isError: isErrorFollowedPosts,
+  } = useGetPostsFromFollowedUsers(currentUser?.id || "");
+  
+  const {
+    data: recentPosts,
+    isLoading: isRecentPostsLoading,
+    isError: isErrorRecentPosts,
   } = useGetRecentPosts();
+
+  // Use followed posts if available, otherwise fallback to recent posts
+  const posts = followedPosts && followedPosts.documents.length > 0 ? followedPosts : recentPosts;
+  const isPostLoading = isFollowedPostsLoading || isRecentPostsLoading;
+  const isErrorPosts = isErrorFollowedPosts || isErrorRecentPosts;
   const {
     data: creators,
     isLoading: isUserLoading,
@@ -35,7 +48,9 @@ const Home = () => {
     <div className="flex flex-1">
       <div className="home-container">
         <div className="home-posts">
-          <h2 className="h3-bold md:h2-bold text-left w-full">Home Feed</h2>
+          <h2 className="h3-bold md:h2-bold text-left w-full">
+            {followedPosts && followedPosts.documents.length > 0 ? "Following" : "Discover"}
+          </h2>
           {isPostLoading && !posts ? (
             <Loader />
           ) : (
