@@ -23,4 +23,10 @@ export enum QUERY_KEYS {
   GET_CONVERSATION_BY_ID = "getConversationById",
   GET_MESSAGES = "getMessages",
   CREATE_OR_GET_CONVERSATION = "createOrGetConversation",
+
+  // FOLLOW KEYS
+  IS_FOLLOWING = "isFollowing",
+  GET_USER_FOLLOWING = "getUserFollowing",
+  GET_USER_FOLLOWERS = "getUserFollowers",
+  GET_POSTS_FROM_FOLLOWED_USERS = "getPostsFromFollowedUsers",
 }
