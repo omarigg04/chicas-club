@@ -16,8 +16,10 @@ const UserCard = ({ user }: UserCardProps) => {
   const { toast } = useToast();
   const { mutateAsync: createOrGetConversation, status } = useCreateOrGetConversation();
   const isCreatingConversation = status === 'loading';
-  const { mutateAsync: followUser, isPending: isFollowPending } = useFollowUser();
-  const { mutateAsync: unfollowUser, isPending: isUnfollowPending } = useUnfollowUser();
+  const { mutateAsync: followUser, status: followStatus } = useFollowUser();
+  const { mutateAsync: unfollowUser, status: unfollowStatus } = useUnfollowUser();
+  const isFollowPending = followStatus === 'pending';
+  const isUnfollowPending = unfollowStatus === 'pending';
   const { data: isFollowingUser, isLoading: isCheckingFollow } = useIsFollowing(currentUser?.id || "", user.$id);
 
   const handleStartChat = async (e: React.MouseEvent) => {
