@@ -20,6 +20,7 @@ export enum QUERY_KEYS {
 
   // CHAT KEYS
   GET_USER_CONVERSATIONS = "getUserConversations",
+  GET_CONVERSATION_BY_ID = "getConversationById",
   GET_MESSAGES = "getMessages",
   CREATE_OR_GET_CONVERSATION = "createOrGetConversation",
 }

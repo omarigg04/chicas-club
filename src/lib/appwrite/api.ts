@@ -593,6 +593,20 @@ export async function updateUser(user: IUpdateUser) {
 // CHAT
 // ============================================================
 
+// ============================== GET CONVERSATION BY ID
+export async function getConversationById(conversationId: string) {
+  try {
+    const conversation = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.conversationCollectionId,
+      conversationId
+    );
+    return conversation;
+  } catch (error) {
+    console.log("getConversationById error:", error);
+  }
+}
+
 // ============================== CREATE OR GET CONVERSATION
 export async function createOrGetConversation(participants: string[]) {
   try {
