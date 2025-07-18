@@ -17,4 +17,9 @@ export enum QUERY_KEYS {
 
   //  SEARCH KEYS
   SEARCH_POSTS = "getSearchPosts",
+
+  // CHAT KEYS
+  GET_USER_CONVERSATIONS = "getUserConversations",
+  GET_MESSAGES = "getMessages",
+  CREATE_OR_GET_CONVERSATION = "createOrGetConversation",
 }

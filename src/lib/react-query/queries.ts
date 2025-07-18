@@ -25,8 +25,14 @@ import {
   searchPosts,
   savePost,
   deleteSavedPost,
+  createOrGetConversation,
+  getUserConversations,
+  sendMessage,
+  getMessages,
+  markMessageAsRead,
+  markConversationAsRead,
 } from "@/lib/appwrite/api";
-import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
+import { INewPost, INewUser, IUpdatePost, IUpdateUser, INewMessage } from "@/types";
 
 // ============================================================
 // AUTH QUERIES
@@ -240,6 +246,82 @@ export const useUpdateUser = () => {
       });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, data?.$id],
+      });
+    },
+  });
+};
+
+// ============================================================
+// CHAT QUERIES
+// ============================================================
+
+export const useCreateOrGetConversation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (participants: string[]) => createOrGetConversation(participants),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_CONVERSATIONS],
+      });
+    },
+  });
+};
+
+export const useGetUserConversations = (userId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_USER_CONVERSATIONS, userId],
+    queryFn: () => getUserConversations(userId),
+    enabled: !!userId,
+  });
+};
+
+export const useSendMessage = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (message: INewMessage) => sendMessage(message),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_MESSAGES, data?.conversationId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_CONVERSATIONS],
+      });
+    },
+  });
+};
+
+export const useGetMessages = (conversationId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_MESSAGES, conversationId],
+    queryFn: () => getMessages(conversationId),
+    enabled: !!conversationId,
+  });
+};
+
+export const useMarkMessageAsRead = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ messageId, userId }: { messageId: string; userId: string }) =>
+      markMessageAsRead(messageId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_MESSAGES],
+      });
+    },
+  });
+};
+
+export const useMarkConversationAsRead = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ conversationId, userId }: { conversationId: string; userId: string }) =>
+      markConversationAsRead(conversationId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_MESSAGES],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_CONVERSATIONS],
       });
     },
   });
