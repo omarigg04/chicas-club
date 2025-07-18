@@ -14,7 +14,7 @@ const ChatWindow = () => {
   const { user } = useUserContext();
   
   // Get conversation ID from URL params or search params
-  const conversationId = paramConversationId || searchParams.get('conversation');
+  const conversationId = paramConversationId || searchParams.get('conversation') || undefined;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [previousConversationId, setPreviousConversationId] = useState<string | undefined>();
   
@@ -48,7 +48,7 @@ const ChatWindow = () => {
   // Reset scroll when conversation changes
   useEffect(() => {
     if (conversationId !== previousConversationId) {
-      setPreviousConversationId(conversationId);
+      setPreviousConversationId(conversationId || undefined);
       // Scroll immediately when conversation changes
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
