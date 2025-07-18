@@ -15,7 +15,7 @@ const UserCard = ({ user }: UserCardProps) => {
   const { user: currentUser } = useUserContext();
   const { toast } = useToast();
   const { mutateAsync: createOrGetConversation, status } = useCreateOrGetConversation();
-  const isCreatingConversation = status === 'pending';
+  const isCreatingConversation = status === 'loading';
 
   const handleStartChat = async (e: React.MouseEvent) => {
     e.preventDefault();
