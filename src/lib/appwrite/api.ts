@@ -467,6 +467,38 @@ export async function getUsers(limit?: number) {
   }
 }
 
+// ============================== SEARCH USERS
+export async function searchUsers(searchTerm: string) {
+  if (!searchTerm.trim()) return { documents: [] };
+  
+  try {
+    const users = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      [
+        Query.orderDesc("$createdAt"),
+        Query.limit(20)
+      ]
+    );
+
+    if (!users) throw Error;
+
+    // Filter users client-side by name or username
+    const filteredUsers = {
+      ...users,
+      documents: users.documents.filter(user => 
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.username.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    };
+
+    return filteredUsers;
+  } catch (error) {
+    console.log(error);
+    return { documents: [] };
+  }
+}
+
 // ============================== GET USER BY ID
 export async function getUserById(userId: string) {
   try {

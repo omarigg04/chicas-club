@@ -12,6 +12,7 @@ import {
   getCurrentUser,
   signOutAccount,
   getUsers,
+  searchUsers,
   createPost,
   getPostById,
   updatePost,
