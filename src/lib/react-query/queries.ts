@@ -295,6 +295,8 @@ export const useGetMessages = (conversationId: string) => {
     queryKey: [QUERY_KEYS.GET_MESSAGES, conversationId],
     queryFn: () => getMessages(conversationId),
     enabled: !!conversationId,
+    staleTime: 0, // Always refetch when conversationId changes
+    refetchOnMount: true,
   });
 };
 
