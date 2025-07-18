@@ -5,7 +5,11 @@ import { IConversation } from "@/types";
 import ConversationItem from "./ConversationItem";
 import Loader from "@/components/shared/Loader";
 
-const ConversationList = () => {
+interface ConversationListProps {
+  onConversationSelect?: () => void;
+}
+
+const ConversationList = ({ onConversationSelect }: ConversationListProps) => {
   const { user } = useUserContext();
   
   // Enable realtime updates for conversations
@@ -48,6 +52,7 @@ const ConversationList = () => {
             conversation={conversation as IConversation}
             currentUserId={user?.id || ""}
             otherUserId={otherUserId || ""}
+            onSelect={onConversationSelect}
           />
         );
       })}
@@ -59,11 +64,13 @@ const ConversationList = () => {
 const ConversationItemWithUser = ({ 
   conversation, 
   currentUserId, 
-  otherUserId 
+  otherUserId,
+  onSelect
 }: {
   conversation: IConversation;
   currentUserId: string;
   otherUserId: string;
+  onSelect?: () => void;
 }) => {
   const { data: otherUser } = useGetUserById(otherUserId);
   
@@ -86,6 +93,7 @@ const ConversationItemWithUser = ({
       conversation={conversation}
       currentUserId={currentUserId}
       otherUser={otherUser as any}
+      onSelect={onSelect}
     />
   );
 };
