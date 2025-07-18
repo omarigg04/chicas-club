@@ -179,32 +179,17 @@ export async function uploadFile(file: File) {
 // ============================== GET FILE URL
 export function getFilePreview(fileId: string) {
   try {
-    // Try getFileView first (direct file access)
-    const fileViewUrl = storage.getFileView(
+    // Use getFileView for direct file access (works better with public images)
+    const fileUrl = storage.getFileView(
       appwriteConfig.storageId,
       fileId
     );
 
-    console.log("Generated file VIEW URL:", fileViewUrl);
+    if (!fileUrl) throw Error;
 
-    // Fallback to preview if needed
-    const filePreviewUrl = storage.getFilePreview(
-      appwriteConfig.storageId,
-      fileId,
-      2000,
-      2000,
-      "top",
-      100
-    );
-
-    console.log("Generated file PREVIEW URL:", filePreviewUrl);
-    console.log("Storage ID:", appwriteConfig.storageId);
-    console.log("File ID:", fileId);
-
-    // Return the view URL (direct file access)
-    return fileViewUrl;
+    return fileUrl;
   } catch (error) {
-    console.log("getFilePreview error:", error);
+    console.log(error);
   }
 }
 
