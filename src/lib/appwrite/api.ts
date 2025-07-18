@@ -1,7 +1,7 @@
 import { ID, Query } from "appwrite";
 
 import { appwriteConfig, account, databases, storage, avatars } from "./config";
-import { IUpdatePost, INewPost, INewUser, IUpdateUser, INewMessage, INewConversation } from "@/types";
+import { IUpdatePost, INewPost, INewUser, IUpdateUser, INewMessage } from "@/types";
 
 // ============================================================
 // AUTH
@@ -179,13 +179,10 @@ export async function uploadFile(file: File) {
 // ============================== GET FILE URL
 export function getFilePreview(fileId: string) {
   try {
-    const fileUrl = storage.getFilePreview(
+    // Use getFileView for direct file access (works better with public images)
+    const fileUrl = storage.getFileView(
       appwriteConfig.storageId,
-      fileId,
-      2000,
-      2000,
-      "top",
-      100
+      fileId
     );
 
     if (!fileUrl) throw Error;
@@ -470,6 +467,38 @@ export async function getUsers(limit?: number) {
   }
 }
 
+// ============================== SEARCH USERS
+export async function searchUsers(searchTerm: string) {
+  if (!searchTerm.trim()) return { documents: [] };
+  
+  try {
+    const users = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      [
+        Query.orderDesc("$createdAt"),
+        Query.limit(20)
+      ]
+    );
+
+    if (!users) throw Error;
+
+    // Filter users client-side by name or username
+    const filteredUsers = {
+      ...users,
+      documents: users.documents.filter(user => 
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.username.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    };
+
+    return filteredUsers;
+  } catch (error) {
+    console.log(error);
+    return { documents: [] };
+  }
+}
+
 // ============================== GET USER BY ID
 export async function getUserById(userId: string) {
   try {
@@ -549,6 +578,20 @@ export async function updateUser(user: IUpdateUser) {
 // CHAT
 // ============================================================
 
+// ============================== GET CONVERSATION BY ID
+export async function getConversationById(conversationId: string) {
+  try {
+    const conversation = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.conversationCollectionId,
+      conversationId
+    );
+    return conversation;
+  } catch (error) {
+    console.log("getConversationById error:", error);
+  }
+}
+
 // ============================== CREATE OR GET CONVERSATION
 export async function createOrGetConversation(participants: string[]) {
   try {
@@ -622,6 +665,8 @@ export async function getUserConversations(userId: string) {
 // ============================== SEND MESSAGE
 export async function sendMessage(message: INewMessage) {
   try {
+    console.log("sendMessage called with:", message);
+    
     const newMessage = await databases.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.messageCollectionId,
@@ -634,6 +679,8 @@ export async function sendMessage(message: INewMessage) {
         readBy: [message.senderId] // Sender has read the message
       }
     );
+
+    console.log("Message created:", newMessage);
 
     // Update conversation with last message info
     await databases.updateDocument(
@@ -649,13 +696,15 @@ export async function sendMessage(message: INewMessage) {
 
     return newMessage;
   } catch (error) {
-    console.log(error);
+    console.log("sendMessage error:", error);
   }
 }
 
 // ============================== GET MESSAGES
 export async function getMessages(conversationId: string, limit: number = 50, offset: number = 0) {
   try {
+    console.log("getMessages called for conversationId:", conversationId);
+    
     const messages = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.messageCollectionId,
@@ -667,9 +716,10 @@ export async function getMessages(conversationId: string, limit: number = 50, of
       ]
     );
 
+    console.log("Messages retrieved:", messages);
     return messages;
   } catch (error) {
-    console.log(error);
+    console.log("getMessages error:", error);
   }
 }
 

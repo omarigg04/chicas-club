@@ -26,6 +26,7 @@ import {
   savePost,
   deleteSavedPost,
   createOrGetConversation,
+  getConversationById,
   getUserConversations,
   sendMessage,
   getMessages,
@@ -273,6 +274,14 @@ export const useCreateOrGetConversation = () => {
   });
 };
 
+export const useGetConversationById = (conversationId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_CONVERSATION_BY_ID, conversationId],
+    queryFn: () => getConversationById(conversationId),
+    enabled: !!conversationId,
+  });
+};
+
 export const useGetUserConversations = (userId: string) => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_USER_CONVERSATIONS, userId],
@@ -301,6 +310,8 @@ export const useGetMessages = (conversationId: string) => {
     queryKey: [QUERY_KEYS.GET_MESSAGES, conversationId],
     queryFn: () => getMessages(conversationId),
     enabled: !!conversationId,
+    staleTime: 0, // Always refetch when conversationId changes
+    refetchOnMount: true,
   });
 };
 

@@ -17,7 +17,7 @@ export const useRealtimeMessages = (conversationId?: string) => {
         const { events, payload } = response;
 
         // Check if the message belongs to our conversation
-        if (payload.conversationId === conversationId) {
+        if ((payload as any)?.conversationId === conversationId) {
           // New message created
           if (events.includes(`databases.${appwriteConfig.databaseId}.collections.${appwriteConfig.messageCollectionId}.documents.*.create`)) {
             queryClient.invalidateQueries({
@@ -58,7 +58,7 @@ export const useRealtimeConversations = (userId?: string) => {
         const { events, payload } = response;
 
         // Check if the conversation involves the current user
-        if (payload.participants && payload.participants.includes(userId)) {
+        if ((payload as any)?.participants && (payload as any)?.participants.includes(userId)) {
           // Conversation created or updated
           if (
             events.includes(`databases.${appwriteConfig.databaseId}.collections.${appwriteConfig.conversationCollectionId}.documents.*.create`) ||

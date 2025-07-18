@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { IConversation, IUser } from "@/types";
 import { multiFormatDateString } from "@/lib/utils";
 
@@ -6,15 +6,21 @@ type ConversationItemProps = {
   conversation: IConversation;
   currentUserId: string;
   otherUser: IUser;
+  onSelect?: () => void;
 };
 
-const ConversationItem = ({ conversation, currentUserId, otherUser }: ConversationItemProps) => {
+const ConversationItem = ({ conversation, currentUserId, otherUser, onSelect }: ConversationItemProps) => {
+  const { conversationId } = useParams();
   const isUnread = conversation.lastMessageSender !== currentUserId && conversation.lastMessage;
+  const isActive = conversationId === conversation.$id;
 
   return (
     <Link
-      to={`/chat/${conversation.id}`}
-      className="flex items-center gap-3 p-4 hover:bg-dark-3 rounded-lg transition-colors"
+      to={`/chat/${conversation.$id}`}
+      onClick={onSelect}
+      className={`flex items-center gap-3 p-4 hover:bg-dark-3 rounded-lg transition-colors ${
+        isActive ? "bg-dark-3 border-l-4 border-primary-500" : ""
+      }`}
     >
       <div className="relative">
         <img
