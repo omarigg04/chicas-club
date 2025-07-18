@@ -5,6 +5,7 @@ import {
   Outlet,
   useParams,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 
 import { Button } from "@/components/ui";
@@ -12,6 +13,7 @@ import { LikedPosts } from "@/_root/pages";
 import { useUserContext } from "@/context/AuthContext";
 import { useGetUserById } from "@/lib/react-query/queries";
 import { GridPostList, Loader } from "@/components/shared";
+import { createOrGetConversation } from "@/lib/appwrite/api";
 
 interface StabBlockProps {
   value: string | number;
@@ -29,8 +31,22 @@ const Profile = () => {
   const { id } = useParams();
   const { user } = useUserContext();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   const { data: currentUser } = useGetUserById(id || "");
+
+  const handleStartChat = async () => {
+    try {
+      if (currentUser && user.id !== currentUser.$id) {
+        const conversation = await createOrGetConversation([user.id, currentUser.$id]);
+        if (conversation) {
+          navigate(`/chat?conversation=${conversation.$id}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error starting chat:", error);
+    }
+  };
 
   if (!currentUser)
     return (
@@ -89,9 +105,22 @@ const Profile = () => {
                 </p>
               </Link>
             </div>
-            <div className={`${user.id === id && "hidden"}`}>
+            <div className={`${user.id === id && "hidden"} flex gap-2`}>
               <Button type="button" className="shad-button_primary px-8">
                 Follow
+              </Button>
+              <Button 
+                type="button" 
+                className="shad-button_dark_4 px-8 flex-center gap-2" 
+                onClick={handleStartChat}
+              >
+                <img
+                  src={"/assets/icons/chat.svg"}
+                  alt="chat"
+                  width={20}
+                  height={20}
+                />
+                Chat
               </Button>
             </div>
           </div>

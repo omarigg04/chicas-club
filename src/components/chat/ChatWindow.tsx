@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useGetMessages, useGetUserById } from "@/lib/react-query/queries";
 import { useUserContext } from "@/context/AuthContext";
 import { useRealtimeMessages } from "@/hooks/useRealtimeMessages";
@@ -9,8 +9,12 @@ import MessageInput from "./MessageInput";
 import Loader from "@/components/shared/Loader";
 
 const ChatWindow = () => {
-  const { conversationId } = useParams();
+  const { conversationId: paramConversationId } = useParams();
+  const [searchParams] = useSearchParams();
   const { user } = useUserContext();
+  
+  // Get conversation ID from URL params or search params
+  const conversationId = paramConversationId || searchParams.get('conversation');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [previousConversationId, setPreviousConversationId] = useState<string | undefined>();
   
