@@ -622,6 +622,8 @@ export async function getUserConversations(userId: string) {
 // ============================== SEND MESSAGE
 export async function sendMessage(message: INewMessage) {
   try {
+    console.log("sendMessage called with:", message);
+    
     const newMessage = await databases.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.messageCollectionId,
@@ -634,6 +636,8 @@ export async function sendMessage(message: INewMessage) {
         readBy: [message.senderId] // Sender has read the message
       }
     );
+
+    console.log("Message created:", newMessage);
 
     // Update conversation with last message info
     await databases.updateDocument(
@@ -649,13 +653,15 @@ export async function sendMessage(message: INewMessage) {
 
     return newMessage;
   } catch (error) {
-    console.log(error);
+    console.log("sendMessage error:", error);
   }
 }
 
 // ============================== GET MESSAGES
 export async function getMessages(conversationId: string, limit: number = 50, offset: number = 0) {
   try {
+    console.log("getMessages called for conversationId:", conversationId);
+    
     const messages = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.messageCollectionId,
@@ -667,9 +673,10 @@ export async function getMessages(conversationId: string, limit: number = 50, of
       ]
     );
 
+    console.log("Messages retrieved:", messages);
     return messages;
   } catch (error) {
-    console.log(error);
+    console.log("getMessages error:", error);
   }
 }
 
