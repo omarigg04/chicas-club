@@ -167,8 +167,7 @@ export async function uploadFile(file: File) {
     const uploadedFile = await storage.createFile(
       appwriteConfig.storageId,
       ID.unique(),
-      file,
-      ["read('any')"] // Permisos de lectura para todos
+      file
     );
 
     return uploadedFile;
