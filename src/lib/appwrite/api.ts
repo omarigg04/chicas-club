@@ -555,18 +555,25 @@ export async function createOrGetConversation(participants: string[]) {
     // Sort participants to ensure consistent conversation lookup
     const sortedParticipants = [...participants].sort();
     
-    // Check if conversation already exists
-    const existingConversation = await databases.listDocuments(
+    // Get all conversations and filter client-side
+    const allConversations = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.conversationCollectionId,
       [
-        Query.equal("participants", sortedParticipants),
-        Query.equal("type", "direct")
+        Query.equal("type", "direct"),
+        Query.limit(100)
       ]
     );
 
-    if (existingConversation.documents.length > 0) {
-      return existingConversation.documents[0];
+    // Find existing conversation with same participants
+    const existingConversation = allConversations.documents.find(conv => {
+      const convParticipants = [...conv.participants].sort();
+      return convParticipants.length === sortedParticipants.length &&
+             convParticipants.every((participant, index) => participant === sortedParticipants[index]);
+    });
+
+    if (existingConversation) {
+      return existingConversation;
     }
 
     // Create new conversation
@@ -593,13 +600,20 @@ export async function getUserConversations(userId: string) {
       appwriteConfig.databaseId,
       appwriteConfig.conversationCollectionId,
       [
-        Query.contains("participants", [userId]),
         Query.orderDesc("$updatedAt"),
         Query.limit(50)
       ]
     );
 
-    return conversations;
+    // Filter conversations client-side to include only those where user is participant
+    const filteredConversations = {
+      ...conversations,
+      documents: conversations.documents.filter(conv => 
+        conv.participants && conv.participants.includes(userId)
+      )
+    };
+
+    return filteredConversations;
   } catch (error) {
     console.log(error);
   }
