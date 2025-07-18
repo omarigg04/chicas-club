@@ -168,7 +168,7 @@ export async function uploadFile(file: File) {
       appwriteConfig.storageId,
       ID.unique(),
       file,
-      ["any()"] // Permisos de lectura para todos
+      ["read('any')"] // Permisos de lectura para todos
     );
 
     return uploadedFile;
