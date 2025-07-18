@@ -93,7 +93,7 @@ const UserSearch = ({ onUserSelect }: UserSearchProps) => {
       </div>
 
       {showResults && searchResults.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-dark-2 border border-dark-4 rounded-lg shadow-lg max-h-60 overflow-y-auto z-50">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-dark-2 border border-dark-4 rounded-lg shadow-lg max-h-60 overflow-y-auto z-[9999]">
           {searchResults.map((searchUser) => (
             <div
               key={searchUser.$id}
@@ -115,7 +115,7 @@ const UserSearch = ({ onUserSelect }: UserSearchProps) => {
       )}
 
       {showResults && searchTerm && searchResults.length === 0 && !isSearching && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-dark-2 border border-dark-4 rounded-lg p-4 text-center text-light-3">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-dark-2 border border-dark-4 rounded-lg p-4 text-center text-light-3 z-[9999]">
           No se encontraron usuarios
         </div>
       )}

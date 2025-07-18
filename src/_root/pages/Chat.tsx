@@ -23,37 +23,27 @@ const Chat = () => {
 
   return (
     <div className="flex h-screen max-h-screen overflow-hidden relative">
-      {/* Sidebar Toggle Button */}
-      <button
-        onClick={toggleSidebar}
-        className={`fixed top-20 left-4 z-50 p-2 bg-dark-3 border border-dark-4 rounded-lg hover:bg-dark-2 transition-all duration-300 ${
-          isSidebarOpen ? 'lg:hidden' : ''
-        }`}
-      >
-        {isSidebarOpen ? (
-          <img
-            src="/assets/icons/back.svg"
-            alt="Hide sidebar"
-            width={20}
-            height={20}
-            className="filter brightness-0 invert"
-          />
-        ) : (
+      {/* Sidebar Toggle Button - Solo mostrar cuando sidebar está oculto */}
+      {!isSidebarOpen && (
+        <button
+          onClick={toggleSidebar}
+          className="fixed top-20 left-4 z-50 p-2 bg-dark-3 border border-dark-4 rounded-lg hover:bg-dark-2 transition-all duration-300"
+        >
           <div className="w-5 h-5 flex flex-col justify-center gap-1">
             <div className="w-full h-0.5 bg-white rounded"></div>
             <div className="w-full h-0.5 bg-white rounded"></div>
             <div className="w-full h-0.5 bg-white rounded"></div>
           </div>
-        )}
-      </button>
+        </button>
+      )}
 
       {/* Conversations Sidebar */}
       <div className={`
         w-80 border-r border-dark-4 bg-dark-2 flex flex-col transition-transform duration-300 ease-in-out
         lg:relative lg:translate-x-0
         ${isSidebarOpen 
-          ? 'fixed inset-y-0 left-0 z-40 translate-x-0' 
-          : 'fixed inset-y-0 left-0 z-40 -translate-x-full lg:w-0 lg:border-r-0'
+          ? 'fixed inset-y-0 left-0 z-[100] translate-x-0' 
+          : 'fixed inset-y-0 left-0 z-[100] -translate-x-full lg:w-0 lg:border-r-0'
         }
       `}>
         <div className="p-4 border-b border-dark-4">
@@ -68,7 +58,7 @@ const Chat = () => {
       {/* Overlay for mobile */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-[90] lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
