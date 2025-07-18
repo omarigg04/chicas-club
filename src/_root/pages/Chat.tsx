@@ -1,4 +1,4 @@
-import { ConversationList, ChatWindow } from "@/components/chat";
+import { ConversationList, ChatWindow, UserSearch } from "@/components/chat";
 
 const Chat = () => {
   return (
@@ -6,7 +6,8 @@ const Chat = () => {
       {/* Conversations Sidebar */}
       <div className="w-80 border-r border-dark-4 bg-dark-2 flex flex-col">
         <div className="p-4 border-b border-dark-4">
-          <h2 className="text-xl font-bold text-light-1">Messages</h2>
+          <h2 className="text-xl font-bold text-light-1 mb-4">Messages</h2>
+          <UserSearch />
         </div>
         <div className="flex-1 overflow-y-auto">
           <ConversationList />
