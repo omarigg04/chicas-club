@@ -1,0 +1,52 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cherryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff4757;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c44569;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="leafGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2ed573;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e90ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Stem -->
+  <path d="M60 25 Q 55 15 50 10 Q 48 8 50 6 Q 52 8 55 12 Q 60 20 65 15 Q 70 10 75 12 Q 77 14 75 16 Q 70 18 65 25" 
+        fill="url(#leafGradient)" stroke="#27ae60" stroke-width="1"/>
+  
+  <!-- Leaves -->
+  <ellipse cx="52" cy="18" rx="8" ry="4" fill="url(#leafGradient)" transform="rotate(-30 52 18)"/>
+  <ellipse cx="68" cy="16" rx="6" ry="3" fill="url(#leafGradient)" transform="rotate(20 68 16)"/>
+  
+  <!-- Left Cherry -->
+  <circle cx="45" cy="70" r="18" fill="url(#cherryGradient)" filter="url(#glow)"/>
+  <ellipse cx="40" cy="65" rx="4" ry="6" fill="#ff6b7a" opacity="0.7"/>
+  <circle cx="42" cy="63" r="2" fill="#ffffff" opacity="0.9"/>
+  
+  <!-- Right Cherry -->
+  <circle cx="75" cy="75" r="18" fill="url(#cherryGradient)" filter="url(#glow)"/>
+  <ellipse cx="70" cy="70" rx="4" ry="6" fill="#ff6b7a" opacity="0.7"/>
+  <circle cx="72" cy="68" r="2" fill="#ffffff" opacity="0.9"/>
+  
+  <!-- Stems connecting to cherries -->
+  <path d="M60 25 Q 55 35 50 45 Q 47 55 45 65" stroke="#27ae60" stroke-width="2" fill="none"/>
+  <path d="M65 25 Q 70 35 72 45 Q 74 55 75 65" stroke="#27ae60" stroke-width="2" fill="none"/>
+  
+  <!-- Sparkles -->
+  <circle cx="35" cy="55" r="1" fill="#ffffff" opacity="0.8">
+    <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="85" cy="60" r="1.5" fill="#ffffff" opacity="0.6">
+    <animate attributeName="opacity" values="0.6;0.1;0.6" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="60" cy="40" r="1" fill="#ffffff" opacity="0.7">
+    <animate attributeName="opacity" values="0.7;0.2;0.7" dur="1.8s" repeatCount="indefinite"/>
+  </circle>
+</svg>
