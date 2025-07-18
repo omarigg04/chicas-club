@@ -1,6 +1,7 @@
 import { useGetUserConversations, useGetUserById } from "@/lib/react-query/queries";
 import { useUserContext } from "@/context/AuthContext";
 import { useRealtimeConversations } from "@/hooks/useRealtimeMessages";
+import { IConversation } from "@/types";
 import ConversationItem from "./ConversationItem";
 import Loader from "@/components/shared/Loader";
 
@@ -60,7 +61,7 @@ const ConversationItemWithUser = ({
   currentUserId, 
   otherUserId 
 }: {
-  conversation: any;
+  conversation: IConversation;
   currentUserId: string;
   otherUserId: string;
 }) => {

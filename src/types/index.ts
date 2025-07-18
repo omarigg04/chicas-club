@@ -52,25 +52,25 @@ export type INewUser = {
 // ============================================================
 
 export type IConversation = {
-  id: string;
+  $id: string;
   participants: string[];
   lastMessage?: string;
   lastMessageTime?: string;
   lastMessageSender?: string;
   type: 'direct' | 'group';
-  createdAt: string;
-  updatedAt: string;
+  $createdAt: string;
+  $updatedAt: string;
 };
 
 export type IMessage = {
-  id: string;
+  $id: string;
   conversationId: string;
   senderId: string;
   content: string;
   type: 'text' | 'image' | 'file';
   readBy: string[];
-  createdAt: string;
-  updatedAt: string;
+  $createdAt: string;
+  $updatedAt: string;
 };
 
 export type INewMessage = {
