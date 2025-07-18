@@ -14,7 +14,7 @@ const UserCard = ({ user }: UserCardProps) => {
   const navigate = useNavigate();
   const { user: currentUser } = useUserContext();
   const { toast } = useToast();
-  const { mutateAsync: createOrGetConversation, isPending } = useCreateOrGetConversation();
+  const { mutateAsync: createOrGetConversation, isPending: isCreatingConversation } = useCreateOrGetConversation();
 
   const handleStartChat = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -66,9 +66,9 @@ const UserCard = ({ user }: UserCardProps) => {
           size="sm" 
           className="shad-button_dark_4 px-3"
           onClick={handleStartChat}
-          disabled={isPending}
+          disabled={isCreatingConversation}
         >
-          {isPending ? "..." : "Chat"}
+          {isCreatingConversation ? "..." : "Chat"}
         </Button>
       </div>
     </div>
