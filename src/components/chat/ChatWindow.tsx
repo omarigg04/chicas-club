@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { useGetMessages, useGetUserById } from "@/lib/react-query/queries";
+import { useGetMessages, useGetUserById, useGetConversationById } from "@/lib/react-query/queries";
 import { useUserContext } from "@/context/AuthContext";
 import { useRealtimeMessages } from "@/hooks/useRealtimeMessages";
 import { IMessage } from "@/types";
@@ -24,26 +24,36 @@ const ChatWindow = () => {
   useRealtimeMessages(conversationId);
   
   const { data: messagesData, isLoading } = useGetMessages(conversationId || "");
+  const { data: conversation } = useGetConversationById(conversationId || "");
   
   const messages = messagesData?.documents || [];
   
-  // Get other user info from conversation participants or messages
+  // Get other user info from conversation participants
   const [otherUserId, setOtherUserId] = useState<string>("");
   const { data: otherUser } = useGetUserById(otherUserId);
 
-  // Find other user ID when conversation or messages change
+  // Find other user ID from conversation participants or messages
   useEffect(() => {
     console.log("ChatWindow useEffect - conversationId:", conversationId, "messages:", messages.length);
     if (conversationId && user?.id) {
-      // First try to get from messages
+      // First try to get from conversation participants
+      if (conversation?.participants) {
+        const conversationOtherUserId = conversation.participants.find((participantId: string) => participantId !== user.id);
+        console.log("Found other user ID from conversation:", conversationOtherUserId);
+        if (conversationOtherUserId) {
+          setOtherUserId(conversationOtherUserId);
+          return;
+        }
+      }
+      
+      // Fallback: try to get from messages
       const messageOtherUserId = messages.find(msg => msg.senderId !== user.id)?.senderId;
-      console.log("Found other user ID:", messageOtherUserId);
+      console.log("Found other user ID from messages:", messageOtherUserId);
       if (messageOtherUserId) {
         setOtherUserId(messageOtherUserId);
       }
-      // TODO: Could also get from conversation participants when we have that data
     }
-  }, [conversationId, messages, user?.id]);
+  }, [conversationId, conversation, messages, user?.id]);
 
   // Reset scroll when conversation changes
   useEffect(() => {
