@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useGetMessages, useGetUserById } from "@/lib/react-query/queries";
 import { useUserContext } from "@/context/AuthContext";
 import { useRealtimeMessages } from "@/hooks/useRealtimeMessages";
+import { IMessage } from "@/types";
 import MessageItem from "./MessageItem";
 import MessageInput from "./MessageInput";
 import Loader from "@/components/shared/Loader";
@@ -109,7 +110,7 @@ const ChatWindow = () => {
             </p>
           </div>
         ) : (
-          messages.map((message) => (
+          messages.map((message: IMessage) => (
             <MessageItem
               key={message.$id}
               message={message}

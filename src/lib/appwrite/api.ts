@@ -1,7 +1,7 @@
 import { ID, Query } from "appwrite";
 
 import { appwriteConfig, account, databases, storage, avatars } from "./config";
-import { IUpdatePost, INewPost, INewUser, IUpdateUser, INewMessage, INewConversation } from "@/types";
+import { IUpdatePost, INewPost, INewUser, IUpdateUser, INewMessage } from "@/types";
 
 // ============================================================
 // AUTH
