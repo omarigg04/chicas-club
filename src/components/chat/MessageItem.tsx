@@ -27,7 +27,7 @@ const MessageItem = ({ message, currentUserId, isOwn }: MessageItemProps) => {
           <span className={`text-xs ${
             isOwn ? "text-primary-100" : "text-light-4"
           }`}>
-            {multiFormatDateString(message.createdAt)}
+            {multiFormatDateString(message.$createdAt)}
           </span>
           
           {isOwn && (

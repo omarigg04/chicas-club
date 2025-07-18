@@ -1,10 +1,15 @@
 import { useGetUserConversations, useGetUserById } from "@/lib/react-query/queries";
 import { useUserContext } from "@/context/AuthContext";
 import { useRealtimeConversations } from "@/hooks/useRealtimeMessages";
+import { IConversation } from "@/types";
 import ConversationItem from "./ConversationItem";
 import Loader from "@/components/shared/Loader";
 
-const ConversationList = () => {
+interface ConversationListProps {
+  onConversationSelect?: () => void;
+}
+
+const ConversationList = ({ onConversationSelect }: ConversationListProps) => {
   const { user } = useUserContext();
   
   // Enable realtime updates for conversations
@@ -35,18 +40,19 @@ const ConversationList = () => {
 
   return (
     <div className="space-y-1">
-      {conversations.map((conversation) => {
+      {conversations.map((conversation: any) => {
         // Get the other user's ID
-        const otherUserId = conversation.participants.find(
+        const otherUserId = conversation.participants?.find(
           (participant: string) => participant !== user?.id
         );
         
         return (
           <ConversationItemWithUser
             key={conversation.$id}
-            conversation={conversation}
+            conversation={conversation as IConversation}
             currentUserId={user?.id || ""}
             otherUserId={otherUserId || ""}
+            onSelect={onConversationSelect}
           />
         );
       })}
@@ -58,11 +64,13 @@ const ConversationList = () => {
 const ConversationItemWithUser = ({ 
   conversation, 
   currentUserId, 
-  otherUserId 
+  otherUserId,
+  onSelect
 }: {
-  conversation: any;
+  conversation: IConversation;
   currentUserId: string;
   otherUserId: string;
+  onSelect?: () => void;
 }) => {
   const { data: otherUser } = useGetUserById(otherUserId);
   
@@ -84,7 +92,8 @@ const ConversationItemWithUser = ({
     <ConversationItem
       conversation={conversation}
       currentUserId={currentUserId}
-      otherUser={otherUser}
+      otherUser={otherUser as any}
+      onSelect={onSelect}
     />
   );
 };

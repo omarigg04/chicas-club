@@ -1,27 +1,70 @@
-import { useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
-import { useGetMessages, useGetUserById } from "@/lib/react-query/queries";
+import { useEffect, useRef, useState } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
+import { useGetMessages, useGetUserById, useGetConversationById } from "@/lib/react-query/queries";
 import { useUserContext } from "@/context/AuthContext";
 import { useRealtimeMessages } from "@/hooks/useRealtimeMessages";
+import { IMessage } from "@/types";
 import MessageItem from "./MessageItem";
 import MessageInput from "./MessageInput";
 import Loader from "@/components/shared/Loader";
 
 const ChatWindow = () => {
-  const { conversationId } = useParams();
+  const { conversationId: paramConversationId } = useParams();
+  const [searchParams] = useSearchParams();
   const { user } = useUserContext();
+  
+  // Get conversation ID from URL params or search params
+  const conversationId = paramConversationId || searchParams.get('conversation') || undefined;
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [previousConversationId, setPreviousConversationId] = useState<string | undefined>();
+  
+  console.log("ChatWindow render - conversationId:", conversationId);
   
   // Enable realtime updates for this conversation
   useRealtimeMessages(conversationId);
   
   const { data: messagesData, isLoading } = useGetMessages(conversationId || "");
+  const { data: conversation } = useGetConversationById(conversationId || "");
   
   const messages = messagesData?.documents || [];
   
-  // Get other user info (assuming we have it in first message)
-  const otherUserId = messages.find(msg => msg.senderId !== user?.id)?.senderId;
-  const { data: otherUser } = useGetUserById(otherUserId || "");
+  // Get other user info from conversation participants
+  const [otherUserId, setOtherUserId] = useState<string>("");
+  const { data: otherUser } = useGetUserById(otherUserId);
+
+  // Find other user ID from conversation participants or messages
+  useEffect(() => {
+    console.log("ChatWindow useEffect - conversationId:", conversationId, "messages:", messages.length);
+    if (conversationId && user?.id) {
+      // First try to get from conversation participants
+      if (conversation?.participants) {
+        const conversationOtherUserId = conversation.participants.find((participantId: string) => participantId !== user.id);
+        console.log("Found other user ID from conversation:", conversationOtherUserId);
+        if (conversationOtherUserId) {
+          setOtherUserId(conversationOtherUserId);
+          return;
+        }
+      }
+      
+      // Fallback: try to get from messages
+      const messageOtherUserId = messages.find(msg => msg.senderId !== user.id)?.senderId;
+      console.log("Found other user ID from messages:", messageOtherUserId);
+      if (messageOtherUserId) {
+        setOtherUserId(messageOtherUserId);
+      }
+    }
+  }, [conversationId, conversation, messages, user?.id]);
+
+  // Reset scroll when conversation changes
+  useEffect(() => {
+    if (conversationId !== previousConversationId) {
+      setPreviousConversationId(conversationId || undefined);
+      // Scroll immediately when conversation changes
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+      }, 100);
+    }
+  }, [conversationId, previousConversationId]);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -81,10 +124,10 @@ const ChatWindow = () => {
             </p>
           </div>
         ) : (
-          messages.map((message) => (
+          messages.map((message: any) => (
             <MessageItem
               key={message.$id}
-              message={message}
+              message={message as IMessage}
               currentUserId={user?.id || ""}
               isOwn={message.senderId === user?.id}
             />
