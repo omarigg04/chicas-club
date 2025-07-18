@@ -46,3 +46,41 @@ export type INewUser = {
   username: string;
   password: string;
 };
+
+// ============================================================
+// CHAT TYPES
+// ============================================================
+
+export type IConversation = {
+  id: string;
+  participants: string[];
+  lastMessage?: string;
+  lastMessageTime?: string;
+  lastMessageSender?: string;
+  type: 'direct' | 'group';
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type IMessage = {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  content: string;
+  type: 'text' | 'image' | 'file';
+  readBy: string[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type INewMessage = {
+  conversationId: string;
+  senderId: string;
+  content: string;
+  type: 'text' | 'image' | 'file';
+};
+
+export type INewConversation = {
+  participants: string[];
+  type: 'direct' | 'group';
+};

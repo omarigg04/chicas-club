@@ -1,7 +1,7 @@
 import { ID, Query } from "appwrite";
 
 import { appwriteConfig, account, databases, storage, avatars } from "./config";
-import { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
+import { IUpdatePost, INewPost, INewUser, IUpdateUser, INewMessage, INewConversation } from "@/types";
 
 // ============================================================
 // AUTH
@@ -540,6 +540,210 @@ export async function updateUser(user: IUpdateUser) {
     }
 
     return updatedUser;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================================================
+// CHAT
+// ============================================================
+
+// ============================== CREATE OR GET CONVERSATION
+export async function createOrGetConversation(participants: string[]) {
+  try {
+    // Sort participants to ensure consistent conversation lookup
+    const sortedParticipants = [...participants].sort();
+    
+    // Get all conversations and filter client-side
+    const allConversations = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.conversationCollectionId,
+      [
+        Query.equal("type", "direct"),
+        Query.limit(100)
+      ]
+    );
+
+    // Find existing conversation with same participants
+    const existingConversation = allConversations.documents.find(conv => {
+      const convParticipants = [...conv.participants].sort();
+      return convParticipants.length === sortedParticipants.length &&
+             convParticipants.every((participant, index) => participant === sortedParticipants[index]);
+    });
+
+    if (existingConversation) {
+      return existingConversation;
+    }
+
+    // Create new conversation
+    const newConversation = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.conversationCollectionId,
+      ID.unique(),
+      {
+        participants: sortedParticipants,
+        type: "direct",
+      }
+    );
+
+    return newConversation;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== GET USER CONVERSATIONS
+export async function getUserConversations(userId: string) {
+  try {
+    const conversations = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.conversationCollectionId,
+      [
+        Query.orderDesc("$updatedAt"),
+        Query.limit(50)
+      ]
+    );
+
+    // Filter conversations client-side to include only those where user is participant
+    const filteredConversations = {
+      ...conversations,
+      documents: conversations.documents.filter(conv => 
+        conv.participants && conv.participants.includes(userId)
+      )
+    };
+
+    return filteredConversations;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== SEND MESSAGE
+export async function sendMessage(message: INewMessage) {
+  try {
+    console.log("sendMessage called with:", message);
+    
+    const newMessage = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.messageCollectionId,
+      ID.unique(),
+      {
+        conversationId: message.conversationId,
+        senderId: message.senderId,
+        content: message.content,
+        type: message.type,
+        readBy: [message.senderId] // Sender has read the message
+      }
+    );
+
+    console.log("Message created:", newMessage);
+
+    // Update conversation with last message info
+    await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.conversationCollectionId,
+      message.conversationId,
+      {
+        lastMessage: message.content,
+        lastMessageTime: new Date().toISOString(),
+        lastMessageSender: message.senderId
+      }
+    );
+
+    return newMessage;
+  } catch (error) {
+    console.log("sendMessage error:", error);
+  }
+}
+
+// ============================== GET MESSAGES
+export async function getMessages(conversationId: string, limit: number = 50, offset: number = 0) {
+  try {
+    console.log("getMessages called for conversationId:", conversationId);
+    
+    const messages = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.messageCollectionId,
+      [
+        Query.equal("conversationId", conversationId),
+        Query.orderDesc("$createdAt"),
+        Query.limit(limit),
+        Query.offset(offset)
+      ]
+    );
+
+    console.log("Messages retrieved:", messages);
+    return messages;
+  } catch (error) {
+    console.log("getMessages error:", error);
+  }
+}
+
+// ============================== MARK MESSAGE AS READ
+export async function markMessageAsRead(messageId: string, userId: string) {
+  try {
+    // Get current message
+    const message = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.messageCollectionId,
+      messageId
+    );
+
+    if (!message) throw Error;
+
+    // Add user to readBy array if not already there
+    const readBy = message.readBy || [];
+    if (!readBy.includes(userId)) {
+      readBy.push(userId);
+    }
+
+    const updatedMessage = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.messageCollectionId,
+      messageId,
+      {
+        readBy: readBy
+      }
+    );
+
+    return updatedMessage;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== MARK CONVERSATION AS READ
+export async function markConversationAsRead(conversationId: string, userId: string) {
+  try {
+    // Get all unread messages in the conversation
+    const messages = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.messageCollectionId,
+      [
+        Query.equal("conversationId", conversationId),
+        Query.notEqual("senderId", userId) // Don't mark own messages as read
+      ]
+    );
+
+    // Mark each message as read
+    const promises = messages.documents.map(message => {
+      const readBy = message.readBy || [];
+      if (!readBy.includes(userId)) {
+        readBy.push(userId);
+        return databases.updateDocument(
+          appwriteConfig.databaseId,
+          appwriteConfig.messageCollectionId,
+          message.$id,
+          { readBy: readBy }
+        );
+      }
+      return null;
+    });
+
+    await Promise.all(promises.filter(promise => promise !== null));
+    
+    return { status: "success" };
   } catch (error) {
     console.log(error);
   }
