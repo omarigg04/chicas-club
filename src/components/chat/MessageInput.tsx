@@ -45,19 +45,19 @@ const MessageInput = ({ conversationId }: MessageInputProps) => {
   };
 
   return (
-    <form onSubmit={handleSendMessage} className="flex gap-2 p-4 border-t border-dark-4">
+    <form onSubmit={handleSendMessage} className="flex gap-2 p-4 border-t border-dark-4 bg-dark-2">
       <Input
         type="text"
         placeholder="Type a message..."
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         disabled={isLoading}
-        className="flex-1"
+        className="flex-1 bg-dark-4 border-dark-4 text-light-1 placeholder:text-light-4 focus:border-primary-500"
       />
       <Button 
         type="submit" 
         disabled={!message.trim() || isLoading}
-        className="px-6"
+        className="px-6 shad-button_primary"
       >
         {isLoading ? "..." : "Send"}
       </Button>
