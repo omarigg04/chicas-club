@@ -13,6 +13,8 @@ const ChatWindow = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [previousConversationId, setPreviousConversationId] = useState<string | undefined>();
   
+  console.log("ChatWindow render - conversationId:", conversationId);
+  
   // Enable realtime updates for this conversation
   useRealtimeMessages(conversationId);
   
@@ -20,9 +22,23 @@ const ChatWindow = () => {
   
   const messages = messagesData?.documents || [];
   
-  // Get other user info (assuming we have it in first message)
-  const otherUserId = messages.find(msg => msg.senderId !== user?.id)?.senderId;
-  const { data: otherUser } = useGetUserById(otherUserId || "");
+  // Get other user info from conversation participants or messages
+  const [otherUserId, setOtherUserId] = useState<string>("");
+  const { data: otherUser } = useGetUserById(otherUserId);
+
+  // Find other user ID when conversation or messages change
+  useEffect(() => {
+    console.log("ChatWindow useEffect - conversationId:", conversationId, "messages:", messages.length);
+    if (conversationId && user?.id) {
+      // First try to get from messages
+      const messageOtherUserId = messages.find(msg => msg.senderId !== user.id)?.senderId;
+      console.log("Found other user ID:", messageOtherUserId);
+      if (messageOtherUserId) {
+        setOtherUserId(messageOtherUserId);
+      }
+      // TODO: Could also get from conversation participants when we have that data
+    }
+  }, [conversationId, messages, user?.id]);
 
   // Reset scroll when conversation changes
   useEffect(() => {
