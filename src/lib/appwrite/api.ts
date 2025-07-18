@@ -168,7 +168,6 @@ export async function uploadFile(file: File) {
       appwriteConfig.storageId,
       ID.unique(),
       file
-      // Sin permisos específicos - usa los del bucket
     );
 
     return uploadedFile;
