@@ -110,10 +110,10 @@ const ChatWindow = () => {
             </p>
           </div>
         ) : (
-          messages.map((message: IMessage) => (
+          messages.map((message: any) => (
             <MessageItem
               key={message.$id}
-              message={message}
+              message={message as IMessage}
               currentUserId={user?.id || ""}
               isOwn={message.senderId === user?.id}
             />

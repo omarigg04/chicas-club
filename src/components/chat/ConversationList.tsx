@@ -36,16 +36,16 @@ const ConversationList = () => {
 
   return (
     <div className="space-y-1">
-      {conversations.map((conversation) => {
+      {conversations.map((conversation: any) => {
         // Get the other user's ID
-        const otherUserId = conversation.participants.find(
+        const otherUserId = conversation.participants?.find(
           (participant: string) => participant !== user?.id
         );
         
         return (
           <ConversationItemWithUser
             key={conversation.$id}
-            conversation={conversation}
+            conversation={conversation as IConversation}
             currentUserId={user?.id || ""}
             otherUserId={otherUserId || ""}
           />
@@ -85,7 +85,7 @@ const ConversationItemWithUser = ({
     <ConversationItem
       conversation={conversation}
       currentUserId={currentUserId}
-      otherUser={otherUser}
+      otherUser={otherUser as any}
     />
   );
 };
