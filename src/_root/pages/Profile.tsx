@@ -138,7 +138,7 @@ const Profile = () => {
                 </p>
               </Link>
             </div>
-            <div className={`${user.id === id && "hidden"} flex gap-2`}>
+            <div className={`${user.id === currentUser?.$id && "hidden"} flex gap-2`}>
               <Button 
                 type="button" 
                 className={isFollowingUser ? "shad-button_dark_4 px-8" : "shad-button_primary px-8"}
