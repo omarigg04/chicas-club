@@ -82,6 +82,7 @@ const Profile = () => {
     }
   };
 
+
   const handleStartChat = async () => {
     if (!authUser || !profileUser) return;
 
