@@ -11,9 +11,10 @@ import {
 import { Button } from "@/components/ui";
 import { LikedPosts } from "@/_root/pages";
 import { useUserContext } from "@/context/AuthContext";
-import { useGetUserById } from "@/lib/react-query/queries";
+import { useGetUserById, useFollowUser, useUnfollowUser, useIsFollowing } from "@/lib/react-query/queries";
 import { GridPostList, Loader } from "@/components/shared";
 import { createOrGetConversation } from "@/lib/appwrite/api";
+import { useToast } from "@/components/ui/use-toast";
 
 interface StabBlockProps {
   value: string | number;
@@ -32,8 +33,14 @@ const Profile = () => {
   const { user } = useUserContext();
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const { data: currentUser } = useGetUserById(id || "");
+  const { mutateAsync: followUser, status: followStatus } = useFollowUser();
+  const { mutateAsync: unfollowUser, status: unfollowStatus } = useUnfollowUser();
+  const isFollowPending = followStatus === 'loading';
+  const isUnfollowPending = unfollowStatus === 'loading';
+  const { data: isFollowingUser, isLoading: isCheckingFollow } = useIsFollowing(user?.id || "", id || "");
 
   const handleStartChat = async () => {
     try {
@@ -45,6 +52,32 @@ const Profile = () => {
       }
     } catch (error) {
       console.error("Error starting chat:", error);
+    }
+  };
+
+  const handleFollowToggle = async () => {
+    if (!user || !currentUser) return;
+    
+    try {
+      if (isFollowingUser) {
+        await unfollowUser({ followerId: user.id, followingId: currentUser.$id });
+        toast({
+          title: "Success",
+          description: `You unfollowed ${currentUser.name}`,
+        });
+      } else {
+        await followUser({ followerId: user.id, followingId: currentUser.$id });
+        toast({
+          title: "Success", 
+          description: `You are now following ${currentUser.name}`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -106,8 +139,13 @@ const Profile = () => {
               </Link>
             </div>
             <div className={`${user.id === id && "hidden"} flex gap-2`}>
-              <Button type="button" className="shad-button_primary px-8">
-                Follow
+              <Button 
+                type="button" 
+                className={isFollowingUser ? "shad-button_dark_4 px-8" : "shad-button_primary px-8"}
+                onClick={handleFollowToggle}
+                disabled={isFollowPending || isUnfollowPending || isCheckingFollow}
+              >
+                {isFollowPending || isUnfollowPending ? "..." : isFollowingUser ? "Unfollow" : "Follow"}
               </Button>
               <Button 
                 type="button" 
