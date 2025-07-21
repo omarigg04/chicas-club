@@ -38,6 +38,9 @@ import {
   getUserFollowing,
   getUserFollowers,
   getPostsFromFollowedUsers,
+  getUserFollowersCount,
+  getUserFollowingCount,
+  isUserFollowing,
 } from "@/lib/appwrite/api";
 import { INewPost, INewUser, IUpdatePost, IUpdateUser, INewMessage } from "@/types";
 
@@ -415,5 +418,30 @@ export const useGetPostsFromFollowedUsers = (userId: string) => {
     queryKey: [QUERY_KEYS.GET_POSTS_FROM_FOLLOWED_USERS, userId],
     queryFn: () => getPostsFromFollowedUsers(userId),
     enabled: !!userId,
+  });
+};
+
+// Para mantener compatibilidad con el código existente
+export const useGetUserFollowersCount = (userId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_USER_FOLLOWERS_COUNT, userId],
+    queryFn: () => getUserFollowersCount(userId),
+    enabled: !!userId,
+  });
+};
+
+export const useGetUserFollowingCount = (userId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_USER_FOLLOWING_COUNT, userId],
+    queryFn: () => getUserFollowingCount(userId),
+    enabled: !!userId,
+  });
+};
+
+export const useIsUserFollowing = (followerId: string, followingId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.IS_USER_FOLLOWING, followerId, followingId],
+    queryFn: () => isUserFollowing(followerId, followingId),
+    enabled: !!followerId && !!followingId && followerId !== followingId,
   });
 };
