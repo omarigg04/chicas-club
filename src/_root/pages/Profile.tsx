@@ -11,18 +11,24 @@ import {
 import { Button } from "@/components/ui";
 import { LikedPosts } from "@/_root/pages";
 import { useUserContext } from "@/context/AuthContext";
-import { useGetUserById } from "@/lib/react-query/queries";
+import { 
+  useGetUserById,
+  useFollowUser, 
+  useUnfollowUser, 
+  useIsFollowing,
+  useGetUserFollowersCount,
+  useGetUserFollowingCount
+} from "@/lib/react-query/queries";
 import { GridPostList, Loader } from "@/components/shared";
 import { createOrGetConversation } from "@/lib/appwrite/api";
 import { useToast } from "@/components/ui/use-toast";
-import { useCreateOrGetConversation, useFollowUser, useUnfollowUser, useIsFollowing } from "@/lib/react-query/queries";
 
-interface StabBlockProps {
+interface StatBlockProps {
   value: string | number;
   label: string;
 }
 
-const StatBlock = ({ value, label }: StabBlockProps) => (
+const StatBlock = ({ value, label }: StatBlockProps) => (
   <div className="flex-center gap-2">
     <p className="small-semibold lg:body-bold text-primary-500">{value}</p>
     <p className="small-medium lg:base-medium text-light-2">{label}</p>
@@ -32,26 +38,20 @@ const StatBlock = ({ value, label }: StabBlockProps) => (
 const Profile = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-
-  // Usuario autenticado
   const { user: authUser } = useUserContext();
-
   const { pathname } = useLocation();
   const { toast } = useToast();
 
   // Perfil del usuario que estamos viendo
   const { data: profileUser } = useGetUserById(id || "");
+  const { data: followersCount } = useGetUserFollowersCount(id || "");
+  const { data: followingCount } = useGetUserFollowingCount(id || "");
+  const { data: isFollowingUser } = useIsFollowing(authUser?.id || "", profileUser?.$id || "");
 
   const { mutateAsync: followUser } = useFollowUser();
   const { mutateAsync: unfollowUser } = useUnfollowUser();
 
-  // Chequea si el authUser ya sigue a este perfil
-  const { data: isFollowingUser, isLoading: isCheckingFollow } =
-    useIsFollowing(authUser?.id || "", profileUser?.$id || "");
-
   const getUserId = (user: any) => user.id || user.$id;
-
-
 
   const handleFollowToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -122,8 +122,8 @@ const Profile = () => {
 
             <div className="flex gap-8 mt-10 items-center justify-center xl:justify-start flex-wrap z-20">
               <StatBlock value={profileUser.posts.length} label="Posts" />
-              <StatBlock value={20} label="Followers" />
-              <StatBlock value={20} label="Following" />
+              <StatBlock value={followersCount ?? 0} label="Followers" />
+              <StatBlock value={followingCount ?? 0} label="Following" />
             </div>
 
             <p className="small-medium md:base-medium text-center xl:text-left mt-7 max-w-screen-sm">
