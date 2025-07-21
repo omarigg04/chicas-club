@@ -29,4 +29,9 @@ export enum QUERY_KEYS {
   GET_USER_FOLLOWING = "getUserFollowing",
   GET_USER_FOLLOWERS = "getUserFollowers",
   GET_POSTS_FROM_FOLLOWED_USERS = "getPostsFromFollowedUsers",
+  
+  // Compatibility keys
+  GET_USER_FOLLOWERS_COUNT = "getUserFollowersCount",
+  GET_USER_FOLLOWING_COUNT = "getUserFollowingCount",
+  IS_USER_FOLLOWING = "isUserFollowing",
 }

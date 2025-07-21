@@ -920,3 +920,40 @@ export async function getPostsFromFollowedUsers(userId: string) {
     console.log(error);
   }
 }
+
+// ============================== GET USER FOLLOWERS COUNT
+export async function getUserFollowersCount(userId: string) {
+  try {
+    const followers = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.followsCollectionId,
+      [Query.equal("followingId", userId)]
+    );
+
+    return followers.total;
+  } catch (error) {
+    console.log(error);
+    return 0;
+  }
+}
+
+// ============================== GET USER FOLLOWING COUNT
+export async function getUserFollowingCount(userId: string) {
+  try {
+    const following = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.followsCollectionId,
+      [Query.equal("followerId", userId)]
+    );
+
+    return following.total;
+  } catch (error) {
+    console.log(error);
+    return 0;
+  }
+}
+
+// ============================== CHECK IF USER IS FOLLOWING ANOTHER USER (Compatibility)
+export async function isUserFollowing(followerId: string, followingId: string) {
+  return isFollowing(followerId, followingId);
+}
