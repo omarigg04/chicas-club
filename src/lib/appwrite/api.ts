@@ -897,19 +897,20 @@ export async function getPostsFromFollowedUsers(userId: string) {
     // First get the list of users that current user follows
     const following = await getUserFollowing(userId);
     
-    if (!following || following.documents.length === 0) {
-      return { documents: [] };
-    }
-
     // Extract the IDs of followed users
-    const followedUserIds = following.documents.map(follow => follow.followingId);
+    const followedUserIds = following && following.documents.length > 0 
+      ? following.documents.map(follow => follow.followingId)
+      : [];
     
-    // Get posts from followed users
+    // Always include current user's posts
+    const allUserIds = [...followedUserIds, userId];
+    
+    // Get posts from followed users AND current user
     const posts = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
       [
-        Query.equal("creator", followedUserIds),
+        Query.equal("creator", allUserIds),
         Query.orderDesc("$createdAt"),
         Query.limit(20)
       ]
