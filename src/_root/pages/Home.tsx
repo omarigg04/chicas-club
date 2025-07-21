@@ -2,7 +2,7 @@ import { Models } from "appwrite";
 
 // import { useToast } from "@/components/ui/use-toast";
 import { Loader, PostCard, UserCard } from "@/components/shared";
-import { useGetRecentPosts, useGetUsers, useGetPostsFromFollowedUsers } from "@/lib/react-query/queries";
+import { useGetUsers, useGetPostsFromFollowedUsers } from "@/lib/react-query/queries";
 import { useUserContext } from "@/context/AuthContext";
 
 const Home = () => {
@@ -15,11 +15,6 @@ const Home = () => {
     isError: isErrorFollowedPosts,
   } = useGetPostsFromFollowedUsers(currentUser?.id || "");
   
-  const {
-    data: recentPosts,
-    isLoading: isRecentPostsLoading,
-    isError: isErrorRecentPosts,
-  } = useGetRecentPosts();
 
   // Always use followed posts (includes user's own posts)
   const posts = followedPosts;
