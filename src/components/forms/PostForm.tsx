@@ -14,17 +14,13 @@ import {
   Button,
   Input,
   Textarea,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
 } from "@/components/ui";
 import { PostValidation } from "@/lib/validation";
 import { useToast } from "@/components/ui/use-toast";
 import { useUserContext } from "@/context/AuthContext";
 import { FileUploader, Loader } from "@/components/shared";
 import { useCreatePost, useUpdatePost, useGetUserGroups } from "@/lib/react-query/queries";
+import { SimpleSelect } from "@/components/ui/simple-select";
 
 type PostFormProps = {
   post?: Models.Document;
@@ -167,43 +163,30 @@ const PostForm = ({ post, action, preSelectedGroupId }: PostFormProps) => {
         <FormField
           control={form.control}
           name="groupId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="shad-form_label">Post to Group (Optional)</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+          render={({ field }) => {
+            const options = [
+              { value: "", label: "Public Post" },
+              ...(userGroups?.documents.map((group) => ({
+                value: group.$id,
+                label: group.name,
+              })) || [])
+            ];
+
+            return (
+              <FormItem>
+                <FormLabel className="shad-form_label">Post to Group (Optional)</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a group or post publicly" />
-                  </SelectTrigger>
+                  <SimpleSelect
+                    options={options}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    placeholder="Select a group or post publicly"
+                  />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center">
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      Public Post
-                    </div>
-                  </SelectItem>
-                  {userGroups?.documents.map((group) => (
-                    <SelectItem key={group.$id} value={group.$id}>
-                      <div className="flex items-center gap-2">
-                        <img
-                          src={group.imageUrl || "/assets/icons/profile-placeholder.svg"}
-                          alt={group.name}
-                          className="w-6 h-6 rounded-full"
-                        />
-                        {group.name}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage className="shad-form_message" />
-            </FormItem>
-          )}
+                <FormMessage className="shad-form_message" />
+              </FormItem>
+            );
+          }}
         />
 
         <div className="flex gap-4 items-center justify-end">

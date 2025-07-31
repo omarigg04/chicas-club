@@ -7,7 +7,7 @@ import { useUserContext } from "@/context/AuthContext";
 import { Loader } from "@/components/shared";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useDebounce } from "@/hooks/useDebounce";
+import useDebounce from "@/hooks/useDebounce";
 import GroupCard from "@/components/shared/GroupCard";
 
 const Groups = () => {
