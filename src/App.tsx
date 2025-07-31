@@ -11,6 +11,10 @@ import {
   UpdateProfile,
   AllUsers,
   Chat,
+  Groups,
+  CreateGroup,
+  GroupDetail,
+  GroupRequests,
 } from "@/_root/pages";
 import AuthLayout from "./_auth/AuthLayout";
 import RootLayout from "./_root/RootLayout";
@@ -36,6 +40,10 @@ const App = () => {
           <Route path="/explore" element={<Explore />} />
           <Route path="/saved" element={<Saved />} />
           <Route path="/all-users" element={<AllUsers />} />
+          <Route path="/groups" element={<Groups />} />
+          <Route path="/groups/create" element={<CreateGroup />} />
+          <Route path="/groups/:id" element={<GroupDetail />} />
+          <Route path="/groups/:id/requests" element={<GroupRequests />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/chat/:conversationId" element={<Chat />} />
           <Route path="/create-post" element={<CreatePost />} />
