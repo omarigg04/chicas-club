@@ -67,16 +67,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    const cookieFallback = localStorage.getItem("cookieFallback");
-    if (
-      cookieFallback === "[]" ||
-      cookieFallback === null ||
-      cookieFallback === undefined
-    ) {
-      navigate("/sign-in");
-    }
+    const initAuth = async () => {
+      const cookieFallback = localStorage.getItem("cookieFallback");
+      
+      // First check if user is authenticated
+      const isValidUser = await checkAuthUser();
+      
+      // Only redirect to sign-in if no valid session AND no cookie
+      if (!isValidUser && (
+        cookieFallback === "[]" ||
+        cookieFallback === null ||
+        cookieFallback === undefined
+      )) {
+        navigate("/sign-in");
+      }
+    };
 
-    checkAuthUser();
+    initAuth();
   }, []);
 
   const value = {

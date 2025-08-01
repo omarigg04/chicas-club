@@ -797,41 +797,59 @@ export async function markConversationAsRead(conversationId: string, userId: str
 // ============================== GET UNREAD CONVERSATIONS COUNT
 export async function getUnreadConversationsCount(userId: string) {
   try {
+    console.log("🔍 Getting unread count for user:", userId);
+    
     // Get user's conversations
     const conversations = await getUserConversations(userId);
     
     if (!conversations || !conversations.documents) {
+      console.log("❌ No conversations found");
       return 0;
     }
 
+    console.log("📱 Found conversations:", conversations.documents.length);
+    
     let unreadCount = 0;
 
     // Check each conversation for unread messages
     for (const conversation of conversations.documents) {
+      console.log("🔍 Checking conversation:", conversation.$id);
+      
+      // Get ALL unread messages in this conversation, not just the last one
       const messages = await databases.listDocuments(
         appwriteConfig.databaseId,
         appwriteConfig.messageCollectionId,
         [
           Query.equal("conversationId", conversation.$id),
           Query.notEqual("senderId", userId), // Don't count own messages
-          Query.orderDesc("$createdAt"),
-          Query.limit(1) // Only check the last message
+          Query.orderDesc("$createdAt")
         ]
       );
 
-      // If there's a message and user hasn't read it, count this conversation
-      if (messages.documents.length > 0) {
-        const lastMessage = messages.documents[0];
-        const readBy = lastMessage.readBy || [];
+      console.log(`📬 Messages in conversation ${conversation.$id}:`, messages.documents.length);
+
+      // Check if there are any unread messages from others
+      let hasUnreadMessages = false;
+      for (const message of messages.documents) {
+        const readBy = message.readBy || [];
+        console.log(`📝 Message ${message.$id} readBy:`, readBy, "includes user?", readBy.includes(userId));
+        
         if (!readBy.includes(userId)) {
-          unreadCount++;
+          hasUnreadMessages = true;
+          break; // Found at least one unread message, no need to check more
         }
+      }
+
+      if (hasUnreadMessages) {
+        unreadCount++;
+        console.log(`✅ Conversation ${conversation.$id} has unread messages. Count: ${unreadCount}`);
       }
     }
 
+    console.log("🎯 Final unread count:", unreadCount);
     return unreadCount;
   } catch (error) {
-    console.log(error);
+    console.log("❌ Error getting unread count:", error);
     return 0;
   }
 }
