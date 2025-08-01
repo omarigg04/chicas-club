@@ -7,7 +7,7 @@ import { useUserContext } from "@/context/AuthContext";
 
 const Home = () => {
   // const { toast } = useToast();
-  const { user: currentUser } = useUserContext();
+  const { user: currentUser, isLoading: isAuthLoading } = useUserContext();
 
   const {
     data: followedPosts,
@@ -25,6 +25,17 @@ const Home = () => {
     isLoading: isUserLoading,
     isError: isErrorCreators,
   } = useGetUsers(10);
+
+  // Show loading while authentication is being checked
+  if (isAuthLoading) {
+    return (
+      <div className="flex flex-1">
+        <div className="flex-center w-full h-full">
+          <Loader />
+        </div>
+      </div>
+    );
+  }
 
   if (isErrorPosts || isErrorCreators) {
     return (
