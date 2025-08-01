@@ -35,6 +35,7 @@ const CreateGroup = () => {
 
   // Handler
   const handleSubmit = async (value: GroupFormValues) => {
+    console.log("🎯 Form submitted with values:", value);
     try {
       await createGroup({
         ...value,
