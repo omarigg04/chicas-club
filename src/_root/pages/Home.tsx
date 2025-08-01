@@ -9,12 +9,18 @@ const Home = () => {
   // const { toast } = useToast();
   const { user: currentUser, isLoading: isAuthLoading } = useUserContext();
 
+  console.log("🏠 Home: Current user:", currentUser);
+  console.log("🏠 Home: Auth loading:", isAuthLoading);
+
   const {
     data: followedPosts,
     isLoading: isFollowedPostsLoading,
     isError: isErrorFollowedPosts,
   } = useGetPostsFromFollowedUsers(currentUser?.id || "");
   
+  console.log("📱 Home: Followed posts data:", followedPosts);
+  console.log("📱 Home: Followed posts loading:", isFollowedPostsLoading);
+  console.log("📱 Home: Followed posts error:", isErrorFollowedPosts);
 
   // Always use followed posts (includes user's own posts)
   const posts = followedPosts;
@@ -25,6 +31,10 @@ const Home = () => {
     isLoading: isUserLoading,
     isError: isErrorCreators,
   } = useGetUsers(10);
+
+  console.log("👥 Home: Creators data:", creators);
+  console.log("👥 Home: Creators loading:", isUserLoading);
+  console.log("👥 Home: Creators error:", isErrorCreators);
 
   // Show loading while authentication is being checked
   if (isAuthLoading) {

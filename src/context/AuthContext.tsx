@@ -68,10 +68,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const initAuth = async () => {
+      console.log("🔍 AuthContext: Starting authentication check");
       const cookieFallback = localStorage.getItem("cookieFallback");
+      console.log("🍪 AuthContext: Cookie fallback:", cookieFallback);
       
       // First check if user is authenticated
       const isValidUser = await checkAuthUser();
+      console.log("✅ AuthContext: User authentication result:", isValidUser);
       
       // Only redirect to sign-in if no valid session AND no cookie
       if (!isValidUser && (
@@ -79,7 +82,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         cookieFallback === null ||
         cookieFallback === undefined
       )) {
+        console.log("🚪 AuthContext: Redirecting to sign-in");
         navigate("/sign-in");
+      } else {
+        console.log("✅ AuthContext: User is authenticated, staying on current page");
       }
     };
 
