@@ -83,9 +83,7 @@ export async function getAccount() {
 // ============================== GET USER
 export async function getCurrentUser() {
   try {
-    console.log("🔍 getCurrentUser: Starting to get current user");
     const currentAccount = await getAccount();
-    console.log("👤 getCurrentUser: Account result:", currentAccount);
 
     if (!currentAccount) throw Error;
 
@@ -94,14 +92,12 @@ export async function getCurrentUser() {
       appwriteConfig.userCollectionId,
       [Query.equal("accountId", currentAccount.$id)]
     );
-    console.log("📱 getCurrentUser: User documents result:", currentUser);
 
     if (!currentUser) throw Error;
 
-    console.log("✅ getCurrentUser: Returning user:", currentUser.documents[0]);
     return currentUser.documents[0];
   } catch (error) {
-    console.log("❌ getCurrentUser: Error occurred:", error);
+    console.log("getCurrentUser error:", error);
     return null;
   }
 }
@@ -986,10 +982,13 @@ export async function getPostsFromFollowedUsers(userId: string) {
     // Get posts from user's groups
     const groupPosts = await getPostsFromUserGroups(userId);
     
-    // Combine regular posts and group posts
+    // Filter out null posts and combine regular posts and group posts
+    const validRegularPosts = regularPosts.documents.filter(post => post && post.$id);
+    const validGroupPosts = (groupPosts?.documents || []).filter(post => post && post.$id);
+    
     const allPosts = [
-      ...regularPosts.documents,
-      ...(groupPosts?.documents || [])
+      ...validRegularPosts,
+      ...validGroupPosts
     ];
 
     // Sort by creation date (most recent first)
@@ -1698,7 +1697,13 @@ export async function getPostsFromUserGroups(userId: string) {
       return { documents: [] };
     }
 
-    const groupIds = userGroups.documents.map(group => group.$id);
+    // Filter out null or invalid groups and get their IDs
+    const validGroups = userGroups.documents.filter(group => group && group.$id);
+    const groupIds = validGroups.map(group => group.$id);
+    
+    if (groupIds.length === 0) {
+      return { documents: [] };
+    }
     
     const groupPosts = await databases.listDocuments(
       appwriteConfig.databaseId,
@@ -1710,7 +1715,13 @@ export async function getPostsFromUserGroups(userId: string) {
       ]
     );
 
-    return groupPosts;
+    // Filter out null posts as well
+    const validPosts = groupPosts.documents.filter(post => post && post.$id);
+    
+    return {
+      ...groupPosts,
+      documents: validPosts
+    };
   } catch (error) {
     console.log(error);
     return { documents: [] };
