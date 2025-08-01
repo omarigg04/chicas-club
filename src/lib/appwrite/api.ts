@@ -1044,6 +1044,7 @@ export async function createGroup(group: INewGroup) {
     return newGroup;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 }
 
