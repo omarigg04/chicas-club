@@ -102,7 +102,7 @@ const Groups = () => {
           <p className="text-light-3">Documents length: {shouldShowResults?.documents?.length || 0}</p>
         </div>
 
-        {isGroupsLoading || isSearchLoading ? (
+        {(shouldShowSearchResults ? isSearchLoading : isGroupsLoading) ? (
           <div className="flex-center w-full h-full">
             <Loader />
           </div>
