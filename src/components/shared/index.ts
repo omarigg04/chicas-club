@@ -9,3 +9,4 @@ export { default as FileUploader } from "./FileUploader";
 export { default as ProfileUploader } from "./ProfileUploader";
 export { default as PostStats } from "./PostStats";
 export { default as GroupCard } from "./GroupCard";
+export { default as NotificationBadge } from "./NotificationBadge";

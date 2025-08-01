@@ -2,9 +2,9 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import { INavLink } from "@/types";
 import { sidebarLinks } from "@/constants";
-import { Loader } from "@/components/shared";
+import { Loader, NotificationBadge } from "@/components/shared";
 import { Button } from "@/components/ui/button";
-import { useSignOutAccount } from "@/lib/react-query/queries";
+import { useSignOutAccount, useGetUnreadConversationsCount } from "@/lib/react-query/queries";
 import { useUserContext, INITIAL_USER } from "@/context/AuthContext";
 
 const LeftSidebar = () => {
@@ -13,6 +13,7 @@ const LeftSidebar = () => {
   const { user, setUser, setIsAuthenticated, isLoading } = useUserContext();
 
   const { mutate: signOut } = useSignOutAccount();
+  const { data: unreadCount = 0 } = useGetUnreadConversationsCount(user.id);
 
   const handleSignOut = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -68,14 +69,19 @@ const LeftSidebar = () => {
                 }`}>
                 <NavLink
                   to={link.route}
-                  className="flex gap-4 items-center p-4">
-                  <img
-                    src={link.imgURL}
-                    alt={link.label}
-                    className={`group-hover:invert-white ${
-                      isActive && "invert-white"
-                    }`}
-                  />
+                  className="flex gap-4 items-center p-4 relative">
+                  <div className="relative">
+                    <img
+                      src={link.imgURL}
+                      alt={link.label}
+                      className={`group-hover:invert-white ${
+                        isActive && "invert-white"
+                      }`}
+                    />
+                    {link.route === "/chat" && (
+                      <NotificationBadge count={unreadCount} />
+                    )}
+                  </div>
                   {link.label}
                 </NavLink>
               </li>

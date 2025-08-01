@@ -794,6 +794,48 @@ export async function markConversationAsRead(conversationId: string, userId: str
   }
 }
 
+// ============================== GET UNREAD CONVERSATIONS COUNT
+export async function getUnreadConversationsCount(userId: string) {
+  try {
+    // Get user's conversations
+    const conversations = await getUserConversations(userId);
+    
+    if (!conversations || !conversations.documents) {
+      return 0;
+    }
+
+    let unreadCount = 0;
+
+    // Check each conversation for unread messages
+    for (const conversation of conversations.documents) {
+      const messages = await databases.listDocuments(
+        appwriteConfig.databaseId,
+        appwriteConfig.messageCollectionId,
+        [
+          Query.equal("conversationId", conversation.$id),
+          Query.notEqual("senderId", userId), // Don't count own messages
+          Query.orderDesc("$createdAt"),
+          Query.limit(1) // Only check the last message
+        ]
+      );
+
+      // If there's a message and user hasn't read it, count this conversation
+      if (messages.documents.length > 0) {
+        const lastMessage = messages.documents[0];
+        const readBy = lastMessage.readBy || [];
+        if (!readBy.includes(userId)) {
+          unreadCount++;
+        }
+      }
+    }
+
+    return unreadCount;
+  } catch (error) {
+    console.log(error);
+    return 0;
+  }
+}
+
 // ============================================================
 // FOLLOWS
 // ============================================================
@@ -1050,9 +1092,6 @@ export async function createGroup(group: INewGroup) {
 
 // ============================== GET GROUPS
 export async function getGroups(limit?: number) {
-  console.log("🚀 getGroups called with limit:", limit);
-  console.log("🔧 appwriteConfig.groupCollectionId:", appwriteConfig.groupCollectionId);
-  
   const queries: any[] = [Query.orderDesc("$createdAt")];
 
   if (limit) {
@@ -1065,8 +1104,6 @@ export async function getGroups(limit?: number) {
       appwriteConfig.groupCollectionId,
       queries
     );
-    
-    console.log("✅ Groups fetched:", groups);
 
     if (!groups) throw Error;
 
