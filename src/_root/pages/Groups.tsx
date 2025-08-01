@@ -94,6 +94,14 @@ const Groups = () => {
           </Link>
         </div>
 
+        <div className="w-full bg-dark-4 p-4 rounded-lg mb-4">
+          <h4 className="text-light-1 font-bold mb-2">Debug Info:</h4>
+          <p className="text-light-3">Groups loading: {isGroupsLoading ? 'true' : 'false'}</p>
+          <p className="text-light-3">Groups data: {groups ? JSON.stringify(groups, null, 2) : 'null'}</p>
+          <p className="text-light-3">Should show results: {shouldShowResults ? 'true' : 'false'}</p>
+          <p className="text-light-3">Documents length: {shouldShowResults?.documents?.length || 0}</p>
+        </div>
+
         {isGroupsLoading || isSearchLoading ? (
           <div className="flex-center w-full h-full">
             <Loader />
