@@ -13,8 +13,6 @@ const LeftSidebar = () => {
   const { user, setUser, setIsAuthenticated, isLoading } = useUserContext();
 
   const { mutate: signOut } = useSignOutAccount();
-  
-  console.log("📧 LeftSidebar: User:", user);
 
   const handleSignOut = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
