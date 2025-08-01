@@ -19,17 +19,23 @@ import { PostValidation } from "@/lib/validation";
 import { useToast } from "@/components/ui/use-toast";
 import { useUserContext } from "@/context/AuthContext";
 import { FileUploader, Loader } from "@/components/shared";
-import { useCreatePost, useUpdatePost } from "@/lib/react-query/queries";
+import { useCreatePost, useUpdatePost, useGetUserGroups } from "@/lib/react-query/queries";
+import { SimpleSelect } from "@/components/ui/simple-select";
 
 type PostFormProps = {
   post?: Models.Document;
   action: "Create" | "Update";
+  preSelectedGroupId?: string;
 };
 
-const PostForm = ({ post, action }: PostFormProps) => {
+const PostForm = ({ post, action, preSelectedGroupId }: PostFormProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useUserContext();
+  
+  // Get user's groups for the dropdown
+  const { data: userGroups } = useGetUserGroups(user.id);
+  
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
@@ -37,6 +43,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
       file: [],
       location: post ? post.location : "",
       tags: post ? post.tags.join(",") : "",
+      groupId: post ? post.groupId : (preSelectedGroupId || ""),
     },
   });
 
@@ -151,6 +158,35 @@ const PostForm = ({ post, action }: PostFormProps) => {
               <FormMessage className="shad-form_message" />
             </FormItem>
           )}
+        />
+
+        <FormField
+          control={form.control}
+          name="groupId"
+          render={({ field }) => {
+            const options = [
+              { value: "", label: "Public Post" },
+              ...(userGroups?.documents.map((group) => ({
+                value: group.$id,
+                label: group.name,
+              })) || [])
+            ];
+
+            return (
+              <FormItem>
+                <FormLabel className="shad-form_label">Post to Group (Optional)</FormLabel>
+                <FormControl>
+                  <SimpleSelect
+                    options={options}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    placeholder="Select a group or post publicly"
+                  />
+                </FormControl>
+                <FormMessage className="shad-form_message" />
+              </FormItem>
+            );
+          }}
         />
 
         <div className="flex gap-4 items-center justify-end">

@@ -41,8 +41,27 @@ import {
   getUserFollowersCount,
   getUserFollowingCount,
   isUserFollowing,
+  createGroup,
+  getGroups,
+  searchGroups,
+  getGroupById,
+  updateGroup,
+  deleteGroup,
+  getGroupMembers,
+  removeGroupMember,
+  isGroupMember,
+  isGroupAdmin,
+  getUserGroups,
+  requestToJoinGroup,
+  approveGroupRequest,
+  rejectGroupRequest,
+  getGroupRequestsForAdmin,
+  getUserGroupRequests,
+  getRequestStatusForGroup,
+  getGroupPosts,
+  getPostsFromUserGroups,
 } from "@/lib/appwrite/api";
-import { INewPost, INewUser, IUpdatePost, IUpdateUser, INewMessage } from "@/types";
+import { INewPost, INewUser, IUpdatePost, IUpdateUser, INewMessage, INewGroup, IUpdateGroup, INewGroupRequest } from "@/types";
 
 // ============================================================
 // AUTH QUERIES
@@ -443,5 +462,204 @@ export const useIsUserFollowing = (followerId: string, followingId: string) => {
     queryKey: [QUERY_KEYS.IS_USER_FOLLOWING, followerId, followingId],
     queryFn: () => isUserFollowing(followerId, followingId),
     enabled: !!followerId && !!followingId && followerId !== followingId,
+  });
+};
+
+// ============================================================
+// GROUP QUERIES
+// ============================================================
+
+export const useCreateGroup = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (group: INewGroup) => createGroup(group),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_GROUPS],
+      });
+    },
+  });
+};
+
+export const useGetGroups = (limit?: number) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_GROUPS, limit],
+    queryFn: () => getGroups(limit),
+  });
+};
+
+export const useSearchGroups = (searchTerm: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.SEARCH_GROUPS, searchTerm],
+    queryFn: () => searchGroups(searchTerm),
+    enabled: !!searchTerm,
+  });
+};
+
+export const useGetGroupById = (groupId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_GROUP_BY_ID, groupId],
+    queryFn: () => getGroupById(groupId),
+    enabled: !!groupId,
+  });
+};
+
+export const useUpdateGroup = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (group: IUpdateGroup) => updateGroup(group),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_GROUPS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_GROUP_BY_ID, data?.$id],
+      });
+    },
+  });
+};
+
+export const useDeleteGroup = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ groupId, imageId }: { groupId: string; imageId?: string }) => 
+      deleteGroup(groupId, imageId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_GROUPS],
+      });
+    },
+  });
+};
+
+export const useGetGroupMembers = (groupId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_GROUP_MEMBERS, groupId],
+    queryFn: () => getGroupMembers(groupId),
+    enabled: !!groupId,
+  });
+};
+
+export const useRemoveGroupMember = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ groupId, userId }: { groupId: string; userId: string }) => 
+      removeGroupMember(groupId, userId),
+    onSuccess: (_, { groupId }) => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_GROUP_MEMBERS, groupId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_GROUP_BY_ID, groupId],
+      });
+    },
+  });
+};
+
+export const useIsGroupMember = (groupId: string, userId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.IS_GROUP_MEMBER, groupId, userId],
+    queryFn: () => isGroupMember(groupId, userId),
+    enabled: !!groupId && !!userId,
+  });
+};
+
+export const useIsGroupAdmin = (groupId: string, userId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.IS_GROUP_ADMIN, groupId, userId],
+    queryFn: () => isGroupAdmin(groupId, userId),
+    enabled: !!groupId && !!userId,
+  });
+};
+
+export const useGetUserGroups = (userId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_USER_GROUPS, userId],
+    queryFn: () => getUserGroups(userId),
+    enabled: !!userId,
+  });
+};
+
+export const useRequestToJoinGroup = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (request: INewGroupRequest) => requestToJoinGroup(request),
+    onSuccess: (_, { groupId, userId }) => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_REQUEST_STATUS_FOR_GROUP, groupId, userId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_GROUP_REQUESTS, userId],
+      });
+    },
+  });
+};
+
+export const useApproveGroupRequest = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ requestId, currentUserId }: { requestId: string; currentUserId: string }) => 
+      approveGroupRequest(requestId, currentUserId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_GROUP_REQUESTS_FOR_ADMIN],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_GROUP_MEMBERS],
+      });
+    },
+  });
+};
+
+export const useRejectGroupRequest = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ requestId, currentUserId }: { requestId: string; currentUserId: string }) => 
+      rejectGroupRequest(requestId, currentUserId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_GROUP_REQUESTS_FOR_ADMIN],
+      });
+    },
+  });
+};
+
+export const useGetGroupRequestsForAdmin = (adminUserId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_GROUP_REQUESTS_FOR_ADMIN, adminUserId],
+    queryFn: () => getGroupRequestsForAdmin(adminUserId),
+    enabled: !!adminUserId,
+  });
+};
+
+export const useGetUserGroupRequests = (userId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_USER_GROUP_REQUESTS, userId],
+    queryFn: () => getUserGroupRequests(userId),
+    enabled: !!userId,
+  });
+};
+
+export const useGetRequestStatusForGroup = (groupId: string, userId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_REQUEST_STATUS_FOR_GROUP, groupId, userId],
+    queryFn: () => getRequestStatusForGroup(groupId, userId),
+    enabled: !!groupId && !!userId,
+  });
+};
+
+export const useGetGroupPosts = (groupId: string, userId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_GROUP_POSTS, groupId, userId],
+    queryFn: () => getGroupPosts(groupId, userId),
+    enabled: !!groupId && !!userId,
+  });
+};
+
+export const useGetPostsFromUserGroups = (userId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_POSTS_FROM_USER_GROUPS, userId],
+    queryFn: () => getPostsFromUserGroups(userId),
+    enabled: !!userId,
   });
 };

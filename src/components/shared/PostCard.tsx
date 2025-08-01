@@ -4,13 +4,16 @@ import { Link } from "react-router-dom";
 import { PostStats } from "@/components/shared";
 import { multiFormatDateString } from "@/lib/utils";
 import { useUserContext } from "@/context/AuthContext";
+import { useGetGroupById } from "@/lib/react-query/queries";
 
 type PostCardProps = {
   post: Models.Document;
+  showGroupBadge?: boolean;
 };
 
-const PostCard = ({ post }: PostCardProps) => {
+const PostCard = ({ post, showGroupBadge = true }: PostCardProps) => {
   const { user } = useUserContext();
+  const { data: group } = useGetGroupById(post.groupId || "");
 
   if (!post.creator) return;
 
@@ -67,6 +70,23 @@ const PostCard = ({ post }: PostCardProps) => {
               </li>
             ))}
           </ul>
+          
+          {/* Group Badge */}
+          {showGroupBadge && post.groupId && group && (
+            <div className="flex items-center gap-2 mt-3 p-2 bg-dark-4 rounded-lg">
+              <img
+                src={group.imageUrl || "/assets/icons/profile-placeholder.svg"}
+                alt={group.name}
+                className="w-5 h-5 rounded-full"
+              />
+              <Link 
+                to={`/groups/${group.$id}`}
+                className="small-regular text-light-2 hover:text-primary-500 transition-colors"
+              >
+                Posted in {group.name}
+              </Link>
+            </div>
+          )}
         </div>
 
         <img

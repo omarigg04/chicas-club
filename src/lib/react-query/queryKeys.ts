@@ -34,4 +34,18 @@ export enum QUERY_KEYS {
   GET_USER_FOLLOWERS_COUNT = "getUserFollowersCount",
   GET_USER_FOLLOWING_COUNT = "getUserFollowingCount",
   IS_USER_FOLLOWING = "isUserFollowing",
+
+  // GROUP KEYS
+  GET_GROUPS = "getGroups",
+  GET_GROUP_BY_ID = "getGroupById",
+  SEARCH_GROUPS = "searchGroups",
+  GET_GROUP_MEMBERS = "getGroupMembers",
+  GET_USER_GROUPS = "getUserGroups",
+  IS_GROUP_MEMBER = "isGroupMember",
+  IS_GROUP_ADMIN = "isGroupAdmin",
+  GET_GROUP_REQUESTS_FOR_ADMIN = "getGroupRequestsForAdmin",
+  GET_USER_GROUP_REQUESTS = "getUserGroupRequests",
+  GET_REQUEST_STATUS_FOR_GROUP = "getRequestStatusForGroup",
+  GET_GROUP_POSTS = "getGroupPosts",
+  GET_POSTS_FROM_USER_GROUPS = "getPostsFromUserGroups",
 }

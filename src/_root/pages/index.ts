@@ -9,3 +9,7 @@ export { default as PostDetails } from "./PostDetails";
 export { default as LikedPosts } from "./LikedPosts";
 export { default as AllUsers } from "./AllUsers";
 export { default as Chat } from "./Chat";
+export { default as Groups } from "./Groups";
+export { default as CreateGroup } from "./CreateGroup";
+export { default as GroupDetail } from "./GroupDetail";
+export { default as GroupRequests } from "./GroupRequests";

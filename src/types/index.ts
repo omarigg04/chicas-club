@@ -19,6 +19,7 @@ export type INewPost = {
   file: File[];
   location?: string;
   tags?: string;
+  groupId?: string;
 };
 
 export type IUpdatePost = {
@@ -29,6 +30,7 @@ export type IUpdatePost = {
   file: File[];
   location?: string;
   tags?: string;
+  groupId?: string;
 };
 
 export type IUser = {
@@ -83,4 +85,68 @@ export type INewMessage = {
 export type INewConversation = {
   participants: string[];
   type: 'direct' | 'group';
+};
+
+// ============================================================
+// GROUP TYPES
+// ============================================================
+
+export type IGroup = {
+  $id: string;
+  name: string;
+  description?: string;
+  imageUrl?: string;
+  imageId?: string;
+  adminId: string;
+  isPrivate: boolean;
+  memberCount: number;
+  $createdAt: string;
+  $updatedAt: string;
+};
+
+export type INewGroup = {
+  name: string;
+  description?: string;
+  file?: File[];
+  adminId: string;
+  isPrivate?: boolean;
+};
+
+export type IUpdateGroup = {
+  groupId: string;
+  name: string;
+  description?: string;
+  imageId?: string;
+  imageUrl?: string;
+  file?: File[];
+};
+
+export type IGroupMember = {
+  $id: string;
+  groupId: string;
+  userId: string;
+  role: 'admin' | 'member';
+  joinedAt: string;
+  $createdAt: string;
+};
+
+export type INewGroupMember = {
+  groupId: string;
+  userId: string;
+  role?: 'admin' | 'member';
+};
+
+export type IGroupRequest = {
+  $id: string;
+  groupId: string;
+  userId: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  requestedAt: string;
+  $createdAt: string;
+  $updatedAt: string;
+};
+
+export type INewGroupRequest = {
+  groupId: string;
+  userId: string;
 };
