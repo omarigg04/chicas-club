@@ -1050,6 +1050,9 @@ export async function createGroup(group: INewGroup) {
 
 // ============================== GET GROUPS
 export async function getGroups(limit?: number) {
+  console.log("🚀 getGroups called with limit:", limit);
+  console.log("🔧 appwriteConfig.groupCollectionId:", appwriteConfig.groupCollectionId);
+  
   const queries: any[] = [Query.orderDesc("$createdAt")];
 
   if (limit) {
@@ -1062,12 +1065,15 @@ export async function getGroups(limit?: number) {
       appwriteConfig.groupCollectionId,
       queries
     );
+    
+    console.log("✅ Groups fetched:", groups);
 
     if (!groups) throw Error;
 
     return groups;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 }
 
