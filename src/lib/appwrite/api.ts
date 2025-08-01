@@ -987,6 +987,8 @@ export async function isUserFollowing(followerId: string, followingId: string) {
 
 // ============================== CREATE GROUP
 export async function createGroup(group: INewGroup) {
+  console.log("🚀 createGroup called with:", group);
+  console.log("🔧 appwriteConfig.groupCollectionId:", appwriteConfig.groupCollectionId);
   try {
     let image = {
       imageUrl: "",
