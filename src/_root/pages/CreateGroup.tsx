@@ -19,10 +19,13 @@ const GroupValidation = z.object({
 type GroupFormValues = z.infer<typeof GroupValidation>;
 
 const CreateGroup = () => {
+  console.log("🎯 CreateGroup component rendered");
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useUserContext();
   const { mutateAsync: createGroup, isLoading: isLoadingCreate } = useCreateGroup();
+  
+  console.log("🔧 CreateGroup hook loaded, isLoading:", isLoadingCreate);
 
   const form = useForm<GroupFormValues>({
     resolver: zodResolver(GroupValidation),
@@ -149,7 +152,8 @@ const CreateGroup = () => {
               <Button
                 type="submit"
                 className="shad-button_primary whitespace-nowrap"
-                disabled={isLoadingCreate}>
+                disabled={isLoadingCreate}
+                onClick={() => console.log("🎯 Submit button clicked")}>
                 {isLoadingCreate && <Loader />}
                 Create Group
               </Button>
