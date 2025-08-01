@@ -48,7 +48,6 @@ import {
   updateGroup,
   deleteGroup,
   getGroupMembers,
-  addGroupMember,
   removeGroupMember,
   isGroupMember,
   isGroupAdmin,

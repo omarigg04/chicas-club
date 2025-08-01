@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { Models } from "appwrite";
 
 import { useUserContext } from "@/context/AuthContext";
-import { useGetGroupById, useGetGroupPosts, useIsGroupMember, useIsGroupAdmin, useGetGroupMembers } from "@/lib/react-query/queries";
+import { useGetGroupById, useGetGroupPosts, useIsGroupMember, useIsGroupAdmin } from "@/lib/react-query/queries";
 import { Loader, PostCard } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 
@@ -14,7 +14,6 @@ const GroupDetail = () => {
   const { data: groupPosts, isLoading: isPostsLoading } = useGetGroupPosts(id || "", user.id);
   const { data: isMember } = useIsGroupMember(id || "", user.id);
   const { data: isAdmin } = useIsGroupAdmin(id || "", user.id);
-  const { data: members } = useGetGroupMembers(id || "");
 
   if (isGroupLoading) {
     return (

@@ -20,8 +20,8 @@ const GroupRequests = () => {
 
   const { data: group, isLoading: isGroupLoading } = useGetGroupById(id || "");
   const { data: requests, isLoading: isRequestsLoading } = useGetGroupRequestsForAdmin(user.id);
-  const { mutate: approveRequest, isPending: isApproving } = useApproveGroupRequest();
-  const { mutate: rejectRequest, isPending: isRejecting } = useRejectGroupRequest();
+  const { mutate: approveRequest, isLoading: isApproving } = useApproveGroupRequest();
+  const { mutate: rejectRequest, isLoading: isRejecting } = useRejectGroupRequest();
 
   // Filter requests for this specific group
   const groupRequests = requests?.documents.filter(request => request.groupId === id) || [];

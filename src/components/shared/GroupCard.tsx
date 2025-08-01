@@ -16,7 +16,7 @@ const GroupCard = ({ group }: GroupCardProps) => {
 
   const { data: isMember, isLoading: isCheckingMembership } = useIsGroupMember(group.$id, user.id);
   const { data: requestStatus } = useGetRequestStatusForGroup(group.$id, user.id);
-  const { mutate: requestToJoin, isPending: isRequestingToJoin } = useRequestToJoinGroup();
+  const { mutate: requestToJoin, isLoading: isRequestingToJoin } = useRequestToJoinGroup();
 
   const handleJoinGroup = () => {
     if (!user.id || !group.$id) return;

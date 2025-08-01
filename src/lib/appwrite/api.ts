@@ -1003,7 +1003,7 @@ export async function createGroup(group: INewGroup) {
         throw Error;
       }
 
-      image = { imageUrl: fileUrl, imageId: uploadedFile.$id };
+      image = { imageUrl: fileUrl.toString(), imageId: uploadedFile.$id };
     }
 
     const newGroup = await databases.createDocument(
@@ -1136,7 +1136,7 @@ export async function updateGroup(group: IUpdateGroup) {
         throw Error;
       }
 
-      image = { imageUrl: fileUrl, imageId: uploadedFile.$id };
+      image = { imageUrl: fileUrl.toString(), imageId: uploadedFile.$id };
     }
 
     const updatedGroup = await databases.updateDocument(

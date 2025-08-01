@@ -22,7 +22,7 @@ const CreateGroup = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useUserContext();
-  const { mutateAsync: createGroup, isPending: isLoadingCreate } = useCreateGroup();
+  const { mutateAsync: createGroup, isLoading: isLoadingCreate } = useCreateGroup();
 
   const form = useForm<GroupFormValues>({
     resolver: zodResolver(GroupValidation),
