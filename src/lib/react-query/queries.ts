@@ -60,6 +60,7 @@ import {
   getRequestStatusForGroup,
   getGroupPosts,
   getPostsFromUserGroups,
+  getUnreadConversationsCount,
 } from "@/lib/appwrite/api";
 import { INewPost, INewUser, IUpdatePost, IUpdateUser, INewMessage, INewGroup, IUpdateGroup, INewGroupRequest } from "@/types";
 
@@ -323,6 +324,9 @@ export const useSendMessage = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_CONVERSATIONS],
       });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_UNREAD_CONVERSATIONS_COUNT],
+      });
     },
   });
 };
@@ -362,7 +366,19 @@ export const useMarkConversationAsRead = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_CONVERSATIONS],
       });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_UNREAD_CONVERSATIONS_COUNT],
+      });
     },
+  });
+};
+
+export const useGetUnreadConversationsCount = (userId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_UNREAD_CONVERSATIONS_COUNT, userId],
+    queryFn: () => getUnreadConversationsCount(userId),
+    enabled: !!userId,
+    refetchInterval: 30000, // Refetch every 30 seconds
   });
 };
 

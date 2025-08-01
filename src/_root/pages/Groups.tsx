@@ -18,8 +18,6 @@ const Groups = () => {
   const { data: groups, isLoading: isGroupsLoading } = useGetGroups();
   const { data: searchResults, isLoading: isSearchLoading } = useSearchGroups(debouncedSearch);
 
-  console.log("🔍 Groups data:", groups);
-  console.log("🔍 Groups loading:", isGroupsLoading);
 
   const shouldShowSearchResults = debouncedSearch !== "";
   const shouldShowResults = shouldShowSearchResults ? searchResults : groups;
@@ -92,14 +90,6 @@ const Groups = () => {
               Create Group
             </Button>
           </Link>
-        </div>
-
-        <div className="w-full bg-dark-4 p-4 rounded-lg mb-4">
-          <h4 className="text-light-1 font-bold mb-2">Debug Info:</h4>
-          <p className="text-light-3">Groups loading: {isGroupsLoading ? 'true' : 'false'}</p>
-          <p className="text-light-3">Groups data: {groups ? JSON.stringify(groups, null, 2) : 'null'}</p>
-          <p className="text-light-3">Should show results: {shouldShowResults ? 'true' : 'false'}</p>
-          <p className="text-light-3">Documents length: {shouldShowResults?.documents?.length || 0}</p>
         </div>
 
         {(shouldShowSearchResults ? isSearchLoading : isGroupsLoading) ? (
