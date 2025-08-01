@@ -1,14 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
 
 import { bottombarLinks } from "@/constants";
-import { NotificationBadge } from "@/components/shared";
-import { useGetUnreadConversationsCount } from "@/lib/react-query/queries";
-import { useUserContext } from "@/context/AuthContext";
 
 const Bottombar = () => {
   const { pathname } = useLocation();
-  const { user } = useUserContext();
-  const { data: unreadCount = 0 } = useGetUnreadConversationsCount(user.id);
 
   return (
     <section className="bottom-bar">
@@ -20,19 +15,14 @@ const Bottombar = () => {
             to={link.route}
             className={`${
               isActive && "rounded-[10px] bg-primary-500 "
-            } flex-center flex-col gap-1 p-2 transition relative`}>
-            <div className="relative">
-              <img
-                src={link.imgURL}
-                alt={link.label}
-                width={16}
-                height={16}
-                className={`${isActive && "invert-white"}`}
-              />
-              {link.route === "/chat" && (
-                <NotificationBadge count={unreadCount} />
-              )}
-            </div>
+            } flex-center flex-col gap-1 p-2 transition`}>
+            <img
+              src={link.imgURL}
+              alt={link.label}
+              width={16}
+              height={16}
+              className={`${isActive && "invert-white"}`}
+            />
 
             <p className="tiny-medium text-light-2">{link.label}</p>
           </Link>
