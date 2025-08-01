@@ -18,6 +18,9 @@ const Groups = () => {
   const { data: groups, isLoading: isGroupsLoading } = useGetGroups();
   const { data: searchResults, isLoading: isSearchLoading } = useSearchGroups(debouncedSearch);
 
+  console.log("🔍 Groups data:", groups);
+  console.log("🔍 Groups loading:", isGroupsLoading);
+
   const shouldShowSearchResults = debouncedSearch !== "";
   const shouldShowResults = shouldShowSearchResults ? searchResults : groups;
 
