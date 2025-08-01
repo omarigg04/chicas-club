@@ -14,6 +14,9 @@ const LeftSidebar = () => {
 
   const { mutate: signOut } = useSignOutAccount();
   const { data: unreadCount = 0 } = useGetUnreadConversationsCount(user.id);
+  
+  console.log("📧 LeftSidebar: Unread count:", unreadCount);
+  console.log("📧 LeftSidebar: User ID:", user.id);
 
   const handleSignOut = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>

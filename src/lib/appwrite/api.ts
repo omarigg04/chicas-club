@@ -83,7 +83,9 @@ export async function getAccount() {
 // ============================== GET USER
 export async function getCurrentUser() {
   try {
+    console.log("🔍 getCurrentUser: Starting to get current user");
     const currentAccount = await getAccount();
+    console.log("👤 getCurrentUser: Account result:", currentAccount);
 
     if (!currentAccount) throw Error;
 
@@ -92,12 +94,14 @@ export async function getCurrentUser() {
       appwriteConfig.userCollectionId,
       [Query.equal("accountId", currentAccount.$id)]
     );
+    console.log("📱 getCurrentUser: User documents result:", currentUser);
 
     if (!currentUser) throw Error;
 
+    console.log("✅ getCurrentUser: Returning user:", currentUser.documents[0]);
     return currentUser.documents[0];
   } catch (error) {
-    console.log(error);
+    console.log("❌ getCurrentUser: Error occurred:", error);
     return null;
   }
 }
