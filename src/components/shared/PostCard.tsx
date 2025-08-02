@@ -15,13 +15,19 @@ const PostCard = ({ post, showGroupBadge = true }: PostCardProps) => {
   const { user } = useUserContext();
   const { data: group } = useGetGroupById(post.groupId || "");
 
-  if (!post.creator) return;
+  console.log("🔍 PostCard - post:", post);
+  console.log("🔍 PostCard - post.creator:", post.creator);
+  
+  if (!post.creator) {
+    console.log("❌ PostCard - post.creator is null/undefined, skipping render");
+    return;
+  }
 
   return (
     <div className="post-card">
       <div className="flex-between">
         <div className="flex items-center gap-3">
-          <Link to={`/profile/${post.creator.$id}`}>
+          <Link to={`/profile/${post.creator?.$id}`}>
             <img
               src={
                 post.creator?.imageUrl ||
@@ -50,7 +56,7 @@ const PostCard = ({ post, showGroupBadge = true }: PostCardProps) => {
 
         <Link
           to={`/update-post/${post.$id}`}
-          className={`${user.id !== post.creator.$id && "hidden"}`}>
+          className={`${user.id !== post.creator?.$id && "hidden"}`}>
           <img
             src={"/assets/icons/edit.svg"}
             alt="edit"
