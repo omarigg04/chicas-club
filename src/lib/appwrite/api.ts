@@ -95,6 +95,27 @@ export async function getCurrentUser() {
 
     if (!currentUser || !currentUser.documents || currentUser.documents.length === 0) {
       console.log("getCurrentUser: No user document found for account:", currentAccount.$id);
+      console.log("getCurrentUser: Attempting to create missing user document...");
+      
+      // Try to create the missing user document
+      try {
+        const avatarUrl = avatars.getInitials(currentAccount.name);
+        const newUserDoc = await saveUserToDB({
+          accountId: currentAccount.$id,
+          name: currentAccount.name,
+          email: currentAccount.email,
+          imageUrl: avatarUrl,
+          username: currentAccount.email.split('@')[0], // Use email prefix as username
+        });
+        
+        if (newUserDoc) {
+          console.log("getCurrentUser: Successfully created missing user document:", newUserDoc.$id);
+          return newUserDoc;
+        }
+      } catch (createError) {
+        console.log("getCurrentUser: Failed to create user document:", createError);
+      }
+      
       return null;
     }
 
@@ -129,6 +150,12 @@ export async function signOutAccount() {
 // ============================== CREATE POST
 export async function createPost(post: INewPost) {
   try {
+    // Validate userId is provided and not empty
+    if (!post.userId || post.userId.trim() === "") {
+      console.error("createPost: Invalid userId provided:", post.userId);
+      throw new Error("Usuario no válido para crear el post");
+    }
+
     // Upload file to appwrite storage
     const uploadedFile = await uploadFile(post.file[0]);
 
