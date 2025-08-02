@@ -28,9 +28,17 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
 
   const { data: currentUser } = useGetCurrentUser();
 
+  console.log("🔍 PostStats - currentUser:", currentUser);
+  console.log("🔍 PostStats - currentUser.save:", currentUser?.save);
+  
   const savedPostRecord = currentUser?.save.find(
-    (record: Models.Document) => record.post.$id === post.$id
+    (record: Models.Document) => {
+      console.log("🔍 PostStats - checking record:", record, "record.post:", record?.post);
+      return record?.post?.$id === post.$id;
+    }
   );
+  
+  console.log("🔍 PostStats - savedPostRecord:", savedPostRecord);
 
   useEffect(() => {
     setIsSaved(!!savedPostRecord);
