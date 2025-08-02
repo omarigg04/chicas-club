@@ -93,9 +93,18 @@ export async function getCurrentUser() {
       [Query.equal("accountId", currentAccount.$id)]
     );
 
-    if (!currentUser) throw Error;
+    if (!currentUser || !currentUser.documents || currentUser.documents.length === 0) {
+      console.log("getCurrentUser: No user document found for account:", currentAccount.$id);
+      return null;
+    }
 
-    return currentUser.documents[0];
+    const userDocument = currentUser.documents[0];
+    if (!userDocument || !userDocument.$id) {
+      console.log("getCurrentUser: User document is invalid:", userDocument);
+      return null;
+    }
+
+    return userDocument;
   } catch (error) {
     console.log("getCurrentUser error:", error);
     return null;
